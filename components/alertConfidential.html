@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Result Alert</title>
+</head>
+<body>
+    <div id="studentResultAlert" class="alert alert-info" role="alert" style="display: none;">
+        <i class="fa-solid fa-triangle-exclamation me-2"></i><span class="fw-bold">Student Result Privacy Notice:</span> 
+        Please be aware that the content of this student result is strictly confidential and intended solely for the authorized recipient. This information is private and should not be shared publicly or disseminated without explicit permission. Unauthorized distribution or disclosure of this result may violate privacy regulations and compromise the integrity of the information. Thank you for your cooperation in maintaining the confidentiality of this data.
+    </div>
+
+    <script>
+    function renderStudentResultAlert() {
+        document.getElementById('studentResultAlert').style.display = 'block';
+    }
+    </script>
+</body>
+</html>

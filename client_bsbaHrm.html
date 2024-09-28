@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <title>BSBA-HRM Results</title>
+
+    <style>
+        .text-yellow {
+            color: #fdc500;
+        }
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        .content {
+            flex: 1 0 auto;
+        }
+        footer {
+            flex-shrink: 0;
+        }
+        #search-input {
+            background-color: white;
+            color: #333;
+            border: 1px solid #007200;
+            height: 45px;
+            box-shadow: 0 0 0 2px #007200;
+        }
+        #search-input::placeholder {
+            color: rgba(0, 0, 0, 0.5);
+        }
+        #search-input:focus {
+            box-shadow: 0 0 0 3px rgba(0, 114, 0, 0.25);
+        }
+        .table-responsive {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .table {
+            margin-bottom: 1.5rem;
+        }
+        .table caption {
+            font-size: 1.5rem;
+            font-weight: 500;
+        }
+        .table th {
+            font-weight: bold;
+            background-color: #fdc500;
+            color: #000;
+            cursor: pointer;
+        }
+        .table td:first-child {
+            background-color: #fdc500;
+            color: #000;
+            font-weight: bold;
+        }
+        .table-bordered {
+            border: 1px solid #dee2e6;
+        }
+        .table-bordered th,
+        .table-bordered td {
+            border: 1px solid #dee2e6;
+        }
+        .table-responsive {
+            margin-bottom: 3rem;
+        }
+        .fade-in {
+            animation: fadeIn 0.5s;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @media screen and (max-width: 767px) {
+            .table-responsive {
+                border: 0;
+            }
+            .table-responsive table {
+                border: 0;
+            }
+            .table-responsive table caption {
+                font-size: 1.3em;
+            }
+            .table-responsive table thead {
+                border: none;
+                clip: rect(0 0 0 0);
+                height: 1px;
+                margin: -1px;
+                overflow: hidden;
+                padding: 0;
+                position: absolute;
+                width: 1px;
+            }
+            .table-responsive table tr {
+                border-bottom: 3px solid #ddd;
+                display: block;
+                margin-bottom: .625em;
+            }
+            .table-responsive table td {
+                border-bottom: 1px solid #ddd;
+                display: block;
+                font-size: .8em;
+                text-align: right;
+            }
+            .table-responsive table td::before {
+                content: attr(data-label);
+                float: left;
+                font-weight: bold;
+                text-transform: uppercase;
+            }
+            .table-responsive table td:last-child {
+                border-bottom: 0;
+            }
+        }
+        .results-header {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+        .results-title {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+        .total-students {
+            font-size: 1rem;
+        }
+        @media (min-width: 768px) {
+            .results-header {
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+            }
+            .results-title {
+                margin-bottom: 0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Navbar placeholder -->
+    <div id="navbar-container"></div>
+
+    <div class="content">
+        <div class="container">
+
+            <div id="studentResultAlert" class="alert alert-info" role="alert" style="display: none;">
+                <i class="fa-solid fa-triangle-exclamation me-2"></i><span class="fw-bold">Student Result Privacy Notice:</span> 
+                Please be aware that the content of this student result is strictly confidential and intended solely for the authorized recipient. This information is private and should not be shared publicly or disseminated without explicit permission. Unauthorized distribution or disclosure of this result may violate privacy regulations and compromise the integrity of the information. Thank you for your cooperation in maintaining the confidentiality of this data.
+            </div>
+
+            <!-- SEARCH BAR -->
+            <div class="container my-4 py-2 rounded" style="background-color: #004b23; color: white;">
+                <div class="d-flex flex-column mb-3">
+                    <label for="search-input" class="form-label me-2 mb-2">Search:</label>
+                    <div class="input-group rounded">
+                        <input type="search" id="search-input" class="form-control rounded" placeholder="Search by name.." aria-label="Search" aria-describedby="search-addon" />
+                    </div>
+                </div>
+            </div>
+
+            <!-- TABLE -->
+            <div id="results-table-container" class="fade-in">
+                <div class="results-header">
+                    <h3 class="results-title">
+                        <i class="fas fa-graduation-cap me-2" style="color: #006400;"></i>
+                        <span style="color: #006400;">BSBA-HRM Results</span>
+                    </h3>
+                    <div class="total-students">
+                        <i class="fas fa-user-friends me-2"></i>
+                        Total Students: <span id="totalStudentsCount" class="animate__animated animate__fadeIn">Loading...</span>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover">
+                        <thead>
+                            <tr>
+                                <th data-sort="fullName"><i class="fas fa-user me-2"></i>Full Name <i class="fas fa-sort"></i></th>
+                            </tr>
+                        </thead>
+                        <tbody id="studentsTableBody">
+                            <!-- Student data will be dynamically inserted here -->
+                        </tbody>
+                    </table>
+                </div>
+                <div id="loadingIndicator" class="text-center">
+                    <div class="spinner-border text-success" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="mt-2">Loading BSBA-HRM results...</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <div id="footer-container"></div>
+
+    <script src="https://kit.fontawesome.com/37ca7b7c97.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAgJzW4fLSxwRetmc6wrOMOfARqwskwAto",
+            authDomain: "easdb-7b6e4.firebaseapp.com",
+            projectId: "easdb-7b6e4",
+            storageBucket: "easdb-7b6e4.appspot.com",
+            messagingSenderId: "621986702779",
+            appId: "1:621986702779:web:7926ff43e862bc69b5909e",
+            measurementId: "G-F8GD1MC73Y"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // Variables
+        let students = [];
+        let currentSort = { field: null, direction: 'asc' };
+
+        // Load navbar
+        fetch('components/navbar.html')
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('navbar-container').innerHTML = data;
+            });
+
+        // Load footer
+        fetch('components/footer.html')
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('footer-container').innerHTML = data;
+                renderFooter();
+            });
+
+        // Load fonts
+        fetch('components/fonts.html')
+            .then(response => response.text())
+            .then(data => {
+                document.head.insertAdjacentHTML('beforeend', data);
+            });
+
+        function renderFooter() {
+            // Add any footer-specific rendering logic here if needed
+        }
+
+        async function fetchBSBAHRMResults(searchTerm = '') {
+            try {
+                document.getElementById('loadingIndicator').style.display = 'block';
+                document.getElementById('studentsTableBody').innerHTML = '';
+                document.getElementById('totalStudentsCount').textContent = 'Loading...';
+
+                const resultsQuery = query(collection(db, 'freshmen_examinees_result'), where('course', '==', 'BSBA-HRM'));
+                const resultsSnapshot = await getDocs(resultsQuery);
+                students = resultsSnapshot.docs.map(doc => ({
+                    fullName: doc.data().fullName,
+                    course: doc.data().course
+                }));
+
+                // Filter students based on the search term
+                if (searchTerm) {
+                    students = students.filter(student =>
+                        student.fullName.toLowerCase().includes(searchTerm.toLowerCase())
+                    );
+                }
+
+                sortStudents(currentSort.field, currentSort.direction);
+                renderStudentsTable();
+            } catch (error) {
+                console.error("Error fetching BSBA-HRM results:", error);
+                document.getElementById('results-table-container').innerHTML = '<p class="text-center text-danger">Error loading BSBA-HRM results. Please try again later.</p>';
+            } finally {
+                document.getElementById('loadingIndicator').style.display = 'none';
+            }
+        }
+
+        function renderStudentsTable() {
+            const studentsTableBody = document.getElementById('studentsTableBody');
+            studentsTableBody.innerHTML = '';
+
+            students.forEach((student, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td data-label="Full Name">${student.fullName}</td>
+                `;
+                studentsTableBody.appendChild(row);
+            });
+
+            document.getElementById('totalStudentsCount').textContent = students.length;
+        }
+
+        // Search students
+        document.getElementById('search-input').addEventListener('input', (event) => {
+            fetchBSBAHRMResults(event.target.value);
+        });
+
+        // Sort students
+        function sortStudents(field, direction) {
+            students.sort((a, b) => {
+                if (a[field] < b[field]) return direction === 'asc' ? -1 : 1;
+                if (a[field] > b[field]) return direction === 'asc' ? 1 : -1;
+                return 0;
+            });
+        }
+
+        // Handle sorting
+        document.querySelectorAll('th[data-sort]').forEach(th => {
+            th.addEventListener('click', () => {
+                const field = th.dataset.sort;
+                if (currentSort.field === field) {
+                    currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
+                } else {
+                    currentSort.field = field;
+                    currentSort.direction = 'asc';
+                }
+                sortStudents(currentSort.field, currentSort.direction);
+                renderStudentsTable();
+                updateSortIcons();
+            });
+        });
+
+        // Update sort icons
+        function updateSortIcons() {
+            document.querySelectorAll('th[data-sort] i.fas:not(.fa-user)').forEach(icon => {
+                icon.className = 'fas fa-sort';
+            });
+            if (currentSort.field) {
+                const th = document.querySelector(`th[data-sort="${currentSort.field}"]`);
+                const icon = th.querySelector('i.fas:not(.fa-user)');
+                icon.className = `fas fa-sort-${currentSort.direction === 'asc' ? 'up' : 'down'}`;
+            }
+        }
+
+        // Display the alert
+        document.getElementById('studentResultAlert').style.display = 'block';
+
+        // Fetch and display BSBA-HRM results when the page loads
+        fetchBSBAHRMResults();
+    </script>
+    
+</body>
+</html>
