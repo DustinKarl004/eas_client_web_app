@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://kit.fontawesome.com/37ca7b7c97.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="dashboard.css">
+    
+    <script>
+        // Prevent going back to this page after logout
+        function preventBack() { window.history.forward(); }
+        setTimeout("preventBack()", 0);
+        window.onunload = function () { null };
+    </script>
+</head>
+<body>
+
+    <!-- Dashboard NAV BAR -->
+    <nav class="navbar navbar-expand-lg mb-3 border-bottom border-3 border-warning" style="background-color: #004b23;">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center flex-wrap" href="dashboard.html">
+                <img src="../assets/navbar_logo.png" alt="" height="42" class="d-inline-block align-text-top me-2">
+                <div class="d-flex flex-column flex-md-row align-items-start align-items-md-center">
+                    <h3 class="mb-0 text-yellow fs-4">CdM</h3>
+                    <h3 class="mb-0 ms-md-2 text-light fs-4">Student Dashboard</h3>
+                </div>
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse mt-3 mt-lg-0" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active text-light" href="dashboard.html">
+                            <i class="fa-solid fa-gauge-high me-2"></i>Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-light" href="#" id="logoutBtn">
+                            <i class="fa-solid fa-sign-out-alt me-2"></i>Logout
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+        <!-- Loading screen -->
+        <div id="loadingScreen" class="loading">
+            <div class="loading-spinner"></div>
+            Loading...
+        </div>
+    
+
+    <div class="content" style="display: none;">
+        <div class="container">
+            <h2 class="mb-4">Application Steps</h2>
+            
+            <div class="step-container" id="stepContainer">
+                <!-- Steps will be dynamically inserted here -->
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <!-- Footer content -->
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+    function renderNavbar(activePage) {
+        const navLinks = document.querySelectorAll('.navbar-nav .nav-link');
+        navLinks.forEach(link => {
+            if (link.textContent.trim().toLowerCase() === activePage.toLowerCase()) {
+                link.classList.add('active');
+            } else {
+                link.classList.remove('active');
+            }
+        });
+    }
+    </script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAgJzW4fLSxwRetmc6wrOMOfARqwskwAto",
+            authDomain: "easdb-7b6e4.firebaseapp.com",
+            projectId: "easdb-7b6e4",
+            storageBucket: "easdb-7b6e4.appspot.com",
+            messagingSenderId: "621986702779",
+            appId: "1:621986702779:web:7926ff43e862bc69b5909e",
+            measurementId: "G-F8GD1MC73Y"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                const userDocRef = doc(db, 'users', user.uid);
+                const userDocSnap = await getDoc(userDocRef);
+                
+                if (userDocSnap.exists()) {
+                    const userData = userDocSnap.data();
+                    loadDashboard(user.uid, userData.email);
+                } else {
+                    console.error('User document not found');
+                    window.location.href = 'login_portal.html';
+                }
+            } else {
+                window.location.href = 'login_portal.html';
+            }
+        });
+
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            signOut(auth).then(() => {
+                window.location.href = 'login_portal.html';
+            }).catch((error) => {
+                console.error('Logout Error:', error);
+            });
+        });
+
+        async function loadDashboard(userId, userEmail) {
+            const stepContainer = document.getElementById('stepContainer');
+            stepContainer.innerHTML = ''; // Clear existing content
+
+            // Step 1: Application Status
+            const approvedApplicantsRef = doc(db, 'freshmen_approved_applicants', userId);
+            const approvedApplicantsSnap = await getDoc(approvedApplicantsRef);
+            const isApproved = approvedApplicantsSnap.exists();
+
+            let applicationStatus = {};
+
+            if (isApproved) {
+                const approvedData = approvedApplicantsSnap.data();
+                const fullName = approvedData.fullName;
+                applicationStatus = {
+                    color: 'green',
+                    text: `Application approved. Name: ${fullName}`,
+                    action: null
+                };
+            } else {
+                applicationStatus = {
+                    color: 'red',
+                    text: 'Application not submitted',
+                    action: 'application_form.html'
+                };
+            }
+
+            const applicationStep = createStepBox('1. Application', applicationStatus);
+            stepContainer.appendChild(applicationStep);
+
+            // Step 2: Entrance Exam
+            const examStatus = await checkEntranceExamStatus(userId);
+            const examStep = createStepBox('2. Entrance Exam', examStatus);
+            stepContainer.appendChild(examStep);
+
+            // Step 3: Course
+            const courseStatus = await checkCourseStatus(userId);
+            const courseStep = createStepBox('3. Course', courseStatus);
+            stepContainer.appendChild(courseStep);
+
+            // Step 4: Required Document Upload
+            const documentUploadStatus = {
+                color: (examStatus.color === 'green' && courseStatus.color === 'green') ? 'red' : 'orange',
+                text: (examStatus.color === 'green' && courseStatus.color === 'green') ? 'Upload required documents' : 'Pending',
+                action: (examStatus.color === 'green' && courseStatus.color === 'green') ? 'document_upload.html' : null
+            };
+            const documentUploadStep = createStepBox('4. Required Document Upload', documentUploadStatus);
+            stepContainer.appendChild(documentUploadStep);
+
+            // Steps 5-8 (placeholder implementation)
+            const remainingSteps = [
+                { title: '5. Assessment', status: { color: 'orange', text: 'Pending' } },
+                { title: '6. NSTP Confirmation', status: { color: 'orange', text: 'Pending' } },
+                { title: '7. Enrollment', status: { color: 'orange', text: 'Pending' } },
+                { title: '8. Medical and Hardcopy Submission', status: { color: 'orange', text: 'Pending' } }
+            ];
+
+            remainingSteps.forEach(step => {
+                const stepBox = createStepBox(step.title, step.status);
+                stepContainer.appendChild(stepBox);
+            });
+
+            // Hide loading screen and show content
+            document.getElementById('loadingScreen').style.display = 'none';
+            document.querySelector('.content').style.display = 'block';
+        }
+
+        async function checkEntranceExamStatus(userId) {
+            const examineesRef = doc(db, 'freshmen_examinees', userId);
+            const resultsRef = doc(db, 'freshmen_examinees_result', userId);
+            const examineesSnap = await getDoc(examineesRef);
+            const resultsSnap = await getDoc(resultsRef);
+
+            if (examineesSnap.exists() && resultsSnap.exists()) {
+                return { color: 'green', text: 'Entrance examination is finished' };
+            } else if (examineesSnap.exists()) {
+                return { color: 'yellow', text: 'Exam scheduled, results pending' };
+            } else {
+                return { color: 'red', text: 'Take the entrance exam', action: 'schedule_exam.html' };
+            }
+        }
+
+        async function checkCourseStatus(userId) {
+            const resultsRef = doc(db, 'freshmen_examinees_result', userId);
+            const resultsSnap = await getDoc(resultsRef);
+
+            if (resultsSnap.exists()) {
+                const data = resultsSnap.data();
+                return { color: 'green', text: `Your course: ${data.course}` };
+            } else {
+                return { color: 'red', text: 'No course assigned' };
+            }
+        }
+
+        function createStepBox(title, status) {
+            const stepBox = document.createElement('div');
+            stepBox.className = `step-box-wrapper`;
+            stepBox.innerHTML = `
+                <div class="step-box ${status.color}">
+                    <h3>${title}</h3>
+                    <i class="fas ${status.color === 'green' ? 'fa-check-circle text-success' : 
+                                    status.color === 'red' ? 'fa-exclamation-circle text-danger' : 
+                                    'fa-spinner fa-spin text-warning'}"></i>
+                    ${status.text}
+                    ${status.action ? `<i class="fas fa-arrow-right arrow" onclick="window.location.href='${status.action}'"></i>` : ''}
+                </div>
+            `;
+            return stepBox;
+        }
+    </script>
+</body>
+</html>
