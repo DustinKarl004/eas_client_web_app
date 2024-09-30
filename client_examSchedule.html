@@ -42,6 +42,18 @@
             justify-content: center;
             align-items: center;
         }
+        
+        /* Adjust footer for mobile screens */
+        @media (max-width: 767px) {
+            .content-wrapper {
+                min-height: calc(100vh - 100px); /* Adjust based on mobile footer height */
+            }
+            #footer-container {
+                position: relative;
+                bottom: 0;
+                width: 100%;
+            }
+        }
     </style>
 </head>
 
