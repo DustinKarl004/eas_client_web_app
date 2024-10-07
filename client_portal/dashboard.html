@@ -144,13 +144,11 @@
                 applicationStatus = {
                     color: 'green',
                     text: `Application approved. Name: ${fullName}`,
-                    action: null
                 };
             } else {
                 applicationStatus = {
                     color: 'red',
                     text: 'Application not submitted',
-                    action: 'application_form.html'
                 };
             }
 
@@ -168,26 +166,31 @@
             stepContainer.appendChild(courseStep);
 
             // Step 4: Required Document Upload
-            const documentUploadStatus = {
-                color: (examStatus.color === 'green' && courseStatus.color === 'green') ? 'red' : 'orange',
-                text: (examStatus.color === 'green' && courseStatus.color === 'green') ? 'Upload required documents' : 'Pending',
-                action: (examStatus.color === 'green' && courseStatus.color === 'green') ? 'document_upload.html' : null
-            };
+            const documentUploadStatus = await checkDocumentUploadStatus(userEmail);
             const documentUploadStep = createStepBox('4. Required Document Upload', documentUploadStatus);
             stepContainer.appendChild(documentUploadStep);
 
-            // Steps 5-8 (placeholder implementation)
-            const remainingSteps = [
-                { title: '5. Assessment', status: { color: 'orange', text: 'Pending' } },
-                { title: '6. NSTP Confirmation', status: { color: 'orange', text: 'Pending' } },
-                { title: '7. Enrollment', status: { color: 'orange', text: 'Pending' } },
-                { title: '8. Medical and Hardcopy Submission', status: { color: 'orange', text: 'Pending' } }
-            ];
+            // Step 5: Assessment
+            const assessmentStatus = await checkAssessmentStatus(userId);
+            const assessmentStep = createStepBox('5. Assessment', assessmentStatus);
+            stepContainer.appendChild(assessmentStep);
 
-            remainingSteps.forEach(step => {
-                const stepBox = createStepBox(step.title, step.status);
-                stepContainer.appendChild(stepBox);
-            });
+            // Step 6: NSTP Confirmation
+            const nstpStatus = await checkNSTPStatus(userEmail);
+            const nstpStep = createStepBox('6. NSTP Confirmation', nstpStatus);
+            stepContainer.appendChild(nstpStep);
+
+            // Step 7: Enrollment
+            const enrollmentStatus = await checkEnrollmentStatus(userId);
+            const enrollmentStep = createStepBox('7. Enrollment', enrollmentStatus);
+            stepContainer.appendChild(enrollmentStep);
+
+            // Step 8: Medical and Hardcopy Submission
+            const medicalStatus = enrollmentStatus.color === 'green' ? 
+                { color: 'orange', text: 'Pending' } :
+                { color: 'orange', text: 'Pending' };
+            const medicalStep = createStepBox('8. Medical and Hardcopy Submission', medicalStatus);
+            stepContainer.appendChild(medicalStep);
 
             // Hide loading screen and show content
             document.getElementById('loadingScreen').style.display = 'none';
@@ -218,6 +221,51 @@
                 return { color: 'green', text: `Your course: ${data.course}` };
             } else {
                 return { color: 'red', text: 'No course assigned' };
+            }
+        }
+
+        async function checkDocumentUploadStatus(userEmail) {
+            const uploadDocRef = doc(db, 'freshmen_stepfour_upload_documents', userEmail);
+            const uploadDocSnap = await getDoc(uploadDocRef);
+
+            if (uploadDocSnap.exists()) {
+                return { color: 'green', text: 'Documents uploaded successfully' };
+            } else {
+                return { color: 'red', text: 'Upload required documents on mobile app' };
+            }
+        }
+
+        async function checkAssessmentStatus(userId) {
+            const assessmentRef = doc(db, 'freshmen_assessment', userId);
+            const assessmentSnap = await getDoc(assessmentRef);
+
+            if (assessmentSnap.exists()) {
+                return { color: 'green', text: 'Assessment completed' };
+            } else {
+                return { color: 'orange', text: 'Assessment pending' };
+            }
+        }
+
+        async function checkNSTPStatus(userEmail) {
+            const nstpRef = doc(db, 'freshmen_nstp_confirmation', userEmail);
+            const nstpSnap = await getDoc(nstpRef);
+
+            if (nstpSnap.exists()) {
+                const data = nstpSnap.data();
+                return { color: 'green', text: `NSTP Program: ${data.selected_nstp}` };
+            } else {
+                return { color: 'red', text: 'Confirm NSTP Program in the mobile app' };
+            }
+        }
+
+        async function checkEnrollmentStatus(userId) {
+            const enrollmentRef = doc(db, 'freshmen_enrollment', userId);
+            const enrollmentSnap = await getDoc(enrollmentRef);
+
+            if (enrollmentSnap.exists()) {
+                return { color: 'green', text: 'Enrollment completed' };
+            } else {
+                return { color: 'orange', text: 'Enrollment pending' };
             }
         }
 
