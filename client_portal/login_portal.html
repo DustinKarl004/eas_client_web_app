@@ -107,11 +107,13 @@
                 const userCredential = await signInWithEmailAndPassword(auth, email, password);
                 const user = userCredential.user;
 
-                // Check if user has exam results
-                const examResultsRef = doc(db, 'freshmen_examinees_result', user.uid);
-                const examResultsSnap = await getDoc(examResultsRef);
+                // Check if user has exam results for freshmen or transferees
+                const freshmenExamResultsRef = doc(db, 'freshmen_examinees_result', user.uid);
+                const transfereeExamResultsRef = doc(db, 'transferee_examinees_result', user.uid);
+                const freshmenExamResultsSnap = await getDoc(freshmenExamResultsRef);
+                const transfereeExamResultsSnap = await getDoc(transfereeExamResultsRef);
 
-                if (examResultsSnap.exists()) {
+                if (freshmenExamResultsSnap.exists() || transfereeExamResultsSnap.exists()) {
                     window.location.href = 'dashboard.html';
                 } else {
                     throw new Error("You don't have permission to access this portal.");

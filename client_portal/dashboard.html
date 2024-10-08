@@ -132,18 +132,28 @@
             stepContainer.innerHTML = ''; // Clear existing content
 
             // Step 1: Application Status
-            const approvedApplicantsRef = doc(db, 'freshmen_approved_applicants', userId);
-            const approvedApplicantsSnap = await getDoc(approvedApplicantsRef);
-            const isApproved = approvedApplicantsSnap.exists();
+            const freshmenApprovedApplicantsRef = doc(db, 'freshmen_approved_applicants', userId);
+            const transfereeApprovedApplicantsRef = doc(db, 'transferee_approved_applicants', userId);
+            const freshmenApprovedApplicantsSnap = await getDoc(freshmenApprovedApplicantsRef);
+            const transfereeApprovedApplicantsSnap = await getDoc(transfereeApprovedApplicantsRef);
+            const isFreshmenApproved = freshmenApprovedApplicantsSnap.exists();
+            const isTransfereeApproved = transfereeApprovedApplicantsSnap.exists();
 
             let applicationStatus = {};
 
-            if (isApproved) {
-                const approvedData = approvedApplicantsSnap.data();
+            if (isFreshmenApproved) {
+                const approvedData = freshmenApprovedApplicantsSnap.data();
                 const fullName = approvedData.fullName;
                 applicationStatus = {
                     color: 'green',
-                    text: `Application approved. Name: ${fullName}`,
+                    text: `Freshmen application approved. Name: ${fullName}`,
+                };
+            } else if (isTransfereeApproved) {
+                const approvedData = transfereeApprovedApplicantsSnap.data();
+                const fullName = approvedData.fullName;
+                applicationStatus = {
+                    color: 'green',
+                    text: `Transferee application approved. Name: ${fullName}`,
                 };
             } else {
                 applicationStatus = {
@@ -188,7 +198,7 @@
             // Step 8: Medical and Hardcopy Submission
             const medicalStatus = enrollmentStatus.color === 'green' ? 
                 { color: 'orange', text: 'Pending' } :
-                { color: 'orange', text: 'Pending' };
+                { color: 'orange', text: 'Complete the previous step first' };
             const medicalStep = createStepBox('8. Medical and Hardcopy Submission', medicalStatus);
             stepContainer.appendChild(medicalStep);
 
@@ -198,74 +208,96 @@
         }
 
         async function checkEntranceExamStatus(userId) {
-            const examineesRef = doc(db, 'freshmen_examinees', userId);
-            const resultsRef = doc(db, 'freshmen_examinees_result', userId);
-            const examineesSnap = await getDoc(examineesRef);
-            const resultsSnap = await getDoc(resultsRef);
+            const freshmenExamineesRef = doc(db, 'freshmen_examinees', userId);
+            const freshmenResultsRef = doc(db, 'freshmen_examinees_result', userId);
+            const transfereeExamineesRef = doc(db, 'transferee_examinees', userId);
+            const transfereeResultsRef = doc(db, 'transferee_examinees_result', userId);
+            
+            const freshmenExamineesSnap = await getDoc(freshmenExamineesRef);
+            const freshmenResultsSnap = await getDoc(freshmenResultsRef);
+            const transfereeExamineesSnap = await getDoc(transfereeExamineesRef);
+            const transfereeResultsSnap = await getDoc(transfereeResultsRef);
 
-            if (examineesSnap.exists() && resultsSnap.exists()) {
+            if ((freshmenExamineesSnap.exists() && freshmenResultsSnap.exists()) || 
+                (transfereeExamineesSnap.exists() && transfereeResultsSnap.exists())) {
                 return { color: 'green', text: 'Entrance examination is finished' };
-            } else if (examineesSnap.exists()) {
+            } else if (freshmenExamineesSnap.exists() || transfereeExamineesSnap.exists()) {
                 return { color: 'yellow', text: 'Exam scheduled, results pending' };
             } else {
-                return { color: 'red', text: 'Take the entrance exam', action: 'schedule_exam.html' };
+                return { color: 'orange', text: 'Complete the previous step first' };
             }
         }
 
         async function checkCourseStatus(userId) {
-            const resultsRef = doc(db, 'freshmen_examinees_result', userId);
-            const resultsSnap = await getDoc(resultsRef);
+            const freshmenResultsRef = doc(db, 'freshmen_examinees_result', userId);
+            const transfereeResultsRef = doc(db, 'transferee_examinees_result', userId);
+            const freshmenResultsSnap = await getDoc(freshmenResultsRef);
+            const transfereeResultsSnap = await getDoc(transfereeResultsRef);
 
-            if (resultsSnap.exists()) {
-                const data = resultsSnap.data();
-                return { color: 'green', text: `Your course: ${data.course}` };
+            if (freshmenResultsSnap.exists()) {
+                const data = freshmenResultsSnap.data();
+                return { color: 'green', text: `Your course (Freshmen): ${data.course}` };
+            } else if (transfereeResultsSnap.exists()) {
+                const data = transfereeResultsSnap.data();
+                return { color: 'green', text: `Your course (Transferee): ${data.course}` };
             } else {
-                return { color: 'red', text: 'No course assigned' };
+                return { color: 'orange', text: 'Complete the previous step first' };
             }
         }
 
         async function checkDocumentUploadStatus(userEmail) {
-            const uploadDocRef = doc(db, 'freshmen_stepfour_upload_documents', userEmail);
-            const uploadDocSnap = await getDoc(uploadDocRef);
+            const freshmenUploadDocRef = doc(db, 'freshmen_stepfour_upload_documents', userEmail);
+            const transfereeUploadDocRef = doc(db, 'transferee_stepfour_upload_documents', userEmail);
+            const freshmenUploadDocSnap = await getDoc(freshmenUploadDocRef);
+            const transfereeUploadDocSnap = await getDoc(transfereeUploadDocRef);
 
-            if (uploadDocSnap.exists()) {
+            if (freshmenUploadDocSnap.exists() || transfereeUploadDocSnap.exists()) {
                 return { color: 'green', text: 'Documents uploaded successfully' };
             } else {
-                return { color: 'red', text: 'Upload required documents on mobile app' };
+                return { color: 'red', text: 'Documents not uploaded, Upload it on Mobile App.' };
             }
         }
 
         async function checkAssessmentStatus(userId) {
-            const assessmentRef = doc(db, 'freshmen_assessment', userId);
-            const assessmentSnap = await getDoc(assessmentRef);
+            const freshmenAssessmentRef = doc(db, 'freshmen_assessment', userId);
+            const transfereeAssessmentRef = doc(db, 'transferee_assessment', userId);
+            const freshmenAssessmentSnap = await getDoc(freshmenAssessmentRef);
+            const transfereeAssessmentSnap = await getDoc(transfereeAssessmentRef);
 
-            if (assessmentSnap.exists()) {
+            if (freshmenAssessmentSnap.exists() || transfereeAssessmentSnap.exists()) {
                 return { color: 'green', text: 'Assessment completed' };
             } else {
-                return { color: 'orange', text: 'Assessment pending' };
+                return { color: 'orange', text: 'Complete the previous step first' };
             }
         }
 
         async function checkNSTPStatus(userEmail) {
-            const nstpRef = doc(db, 'freshmen_nstp_confirmation', userEmail);
-            const nstpSnap = await getDoc(nstpRef);
+            const freshmenNstpRef = doc(db, 'freshmen_nstp_confirmation', userEmail);
+            const transfereeNstpRef = doc(db, 'transferee_nstp_confirmation', userEmail);
+            const freshmenNstpSnap = await getDoc(freshmenNstpRef);
+            const transfereeNstpSnap = await getDoc(transfereeNstpRef);
 
-            if (nstpSnap.exists()) {
-                const data = nstpSnap.data();
-                return { color: 'green', text: `NSTP Program: ${data.selected_nstp}` };
+            if (freshmenNstpSnap.exists()) {
+                const data = freshmenNstpSnap.data();
+                return { color: 'green', text: `NSTP Program (Freshmen): ${data.selected_nstp}` };
+            } else if (transfereeNstpSnap.exists()) {
+                const data = transfereeNstpSnap.data();
+                return { color: 'green', text: `NSTP Program (Transferee): ${data.selected_nstp}` };
             } else {
-                return { color: 'red', text: 'Confirm NSTP Program in the mobile app' };
+                return { color: 'red', text: 'NSTP not confirmed, Confirm it on Mobile App, After the confirmation of assessment.' };
             }
         }
 
         async function checkEnrollmentStatus(userId) {
-            const enrollmentRef = doc(db, 'freshmen_enrollment', userId);
-            const enrollmentSnap = await getDoc(enrollmentRef);
+            const freshmenEnrollmentRef = doc(db, 'freshmen_enrollment', userId);
+            const transfereeEnrollmentRef = doc(db, 'transferee_enrollment', userId);
+            const freshmenEnrollmentSnap = await getDoc(freshmenEnrollmentRef);
+            const transfereeEnrollmentSnap = await getDoc(transfereeEnrollmentRef);
 
-            if (enrollmentSnap.exists()) {
+            if (freshmenEnrollmentSnap.exists() || transfereeEnrollmentSnap.exists()) {
                 return { color: 'green', text: 'Enrollment completed' };
             } else {
-                return { color: 'orange', text: 'Enrollment pending' };
+                return { color: 'orange', text: 'Complete the previous step first' };
             }
         }
 
@@ -276,7 +308,8 @@
                 <div class="step-box ${status.color}">
                     <h3>${title}</h3>
                     <i class="fas ${status.color === 'green' ? 'fa-check-circle text-success' : 
-                                    status.color === 'red' ? 'fa-exclamation-circle text-danger' : 
+                                    status.color === 'orange' ? 'fa-exclamation-circle text-warning' : 
+                                    status.color === 'red' ? 'fa-times-circle text-danger' :
                                     'fa-spinner fa-spin text-warning'}"></i>
                     ${status.text}
                     ${status.action ? `<i class="fas fa-arrow-right arrow" onclick="window.location.href='${status.action}'"></i>` : ''}
