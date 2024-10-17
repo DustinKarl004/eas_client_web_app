@@ -6,7 +6,214 @@
     <title>Student Dashboard</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://kit.fontawesome.com/37ca7b7c97.js" crossorigin="anonymous"></script>
-    <link rel="stylesheet" href="dashboard.css">
+
+    <style>
+        html, body {
+    height: 100%;
+}
+.text-yellow {
+    color: #fdc500;
+}
+body {
+    display: flex;
+    flex-direction: column;
+    background-color: #f0f0f0;
+}
+.content {
+    flex: 1 0 auto;
+}
+.navbar-nav .nav-link.active {
+    border-bottom: 3px solid #fdc500;
+}
+
+.navbar-nav .nav-link {
+    padding-bottom: 5px;
+}
+
+.navbar-nav .nav-link:hover {
+    border-bottom: 3px solid #fdc500;
+}
+
+.navbar-toggler-icon {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255, 255, 255, 1%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+}
+
+.navbar-toggler {
+    border-color: white;
+    box-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
+}
+
+/* Override Bootstrap's default toggler styles */
+.navbar-toggler:focus,
+.navbar-toggler:hover,
+.navbar-toggler:active {
+    box-shadow: 0 0 5px rgba(255, 255, 255, 0.5) !important;
+}
+
+.navbar-toggler .navbar-toggler-icon {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255, 255, 255, 1%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+}
+
+@media (max-width: 991px) {
+    .navbar-brand {
+        max-width: 80%;
+    }
+    .navbar-brand img {
+        height: 36px;
+    }
+    .navbar-brand h3 {
+        font-size: 1.2rem !important;   
+    }
+    .navbar-collapse {
+        position: fixed;
+        top: 59px; /* Adjusted to keep yellow line visible */
+        left: -250px;
+        width: 250px;
+        height: calc(100vh - 59px); /* Adjusted to keep yellow line visible */
+        background-color: #004b23;
+        transition: left 0.3s ease;
+        z-index: 1000;
+        overflow-y: auto;
+    }
+    .navbar-collapse.show {
+        left: 0;
+    }
+    .navbar-nav {
+        flex-direction: column;
+        padding-top: 20px;
+    }
+    .navbar-nav .nav-item {
+        width: 100%;
+        text-align: center;
+
+    }
+    .navbar-nav .nav-link {
+        padding: 10px;
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+        font-size: 0.9rem;
+    }
+    .navbar-nav .nav-link.active {
+        border-bottom: 3px solid #fdc500;
+    }
+    .navbar-toggler {
+        position: relative;
+        z-index: 1001;
+    }
+}
+footer {
+    flex-shrink: 0;
+}
+.step-box {
+    background-color: #ffffff;
+    border-radius: 15px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1), 0 6px 6px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    margin-bottom: 30px;
+    transition: all 0.3s ease;
+    height: 200px;
+    position: relative;
+    overflow: hidden;
+}
+.step-box:hover {
+    transform: translateY(-10px) rotateX(5deg);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2), 0 10px 10px rgba(0, 0, 0, 0.1);
+}
+.step-box h3 {
+    color: #333;
+    margin-bottom: 15px;
+    font-size: 1.2rem;
+}
+.step-box.green {
+    background-color: rgba(40, 167, 69, 0.1);
+}
+.step-box.yellow {
+    background-color: rgba(255, 193, 7, 0.1);
+}
+.step-box.red {
+    background-color: rgba(220, 53, 69, 0.1);
+}
+.step-box.orange {
+    background-color: rgba(253, 126, 20, 0.1);
+}
+.step-box i {
+    font-size: 1.5em;
+    margin-right: 10px;
+}
+.step-box .arrow {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    cursor: pointer;
+}
+.step-box::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0) 70%);
+    transform: rotate(30deg);
+    transition: all 0.5s ease;
+}
+.step-box:hover::after {
+    transform: rotate(0deg);
+}
+.step-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+.step-box-wrapper {
+    width: 100%;
+}
+@media (min-width: 768px) {
+    .step-box-wrapper {
+        width: calc(50% - 15px);
+    }
+}
+.loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    font-size: 24px;
+}
+.loading-spinner {
+    border: 5px solid #f3f3f3;
+    border-top: 5px solid #3498db;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 1s linear infinite;
+    margin-right: 10px;
+}
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+.btn-logout {
+    background-color: transparent;
+    color: #ffffff;
+    border: 2px solid #ad042e;
+    padding: 8px 16px;
+    border-radius: 20px;
+    transition: all 0.3s ease;
+    font-weight: bold;
+}
+.btn-logout:hover {
+    background-color: #ad042e;
+    color: #ffffff;
+}
+@media (max-width: 991px) {
+    .btn-logout {
+        width: 80%;
+        margin: 10px auto;
+        font-size: 0.9rem;
+        padding: 6px 12px;
+    }
+}
+    </style>
     
     <script>
         // Prevent going back to this page after logout
@@ -32,7 +239,7 @@
                 <span class="navbar-toggler-icon"></span>
             </button>
 
-            <div class="collapse navbar-collapse mt-3 mt-lg-0" id="navbarNav">
+            <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
                         <a class="nav-link active text-light" href="dashboard.html">
@@ -40,20 +247,39 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link text-light" href="#" id="logoutBtn">
+                        <button class="btn btn-logout" data-bs-toggle="modal" data-bs-target="#logoutModal">
                             <i class="fa-solid fa-sign-out-alt me-2"></i>Logout
-                        </a>
+                        </button>
                     </li>
                 </ul>
             </div>
         </div>
     </nav>
 
-        <!-- Loading screen -->
-        <div id="loadingScreen" class="loading">
-            <div class="loading-spinner"></div>
-            Loading...
+    <!-- Logout Modal -->
+    <div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header" style="background-color: #ad042e; color: white;">
+                    <h5 class="modal-title" id="logoutModalLabel">Confirm Logout</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to logout?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-danger" id="confirmLogout">Logout</button>
+                </div>
+            </div>
         </div>
+    </div>
+
+    <!-- Loading screen -->
+    <div id="loadingScreen" class="loading">
+        <div class="loading-spinner"></div>
+        Loading...
+    </div>
     
 
     <div class="content" style="display: none;">
@@ -82,241 +308,8 @@
             }
         });
     }
+
     </script>
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc, collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyAgJzW4fLSxwRetmc6wrOMOfARqwskwAto",
-            authDomain: "easdb-7b6e4.firebaseapp.com",
-            projectId: "easdb-7b6e4",
-            storageBucket: "easdb-7b6e4.appspot.com",
-            messagingSenderId: "621986702779",
-            appId: "1:621986702779:web:7926ff43e862bc69b5909e",
-            measurementId: "G-F8GD1MC73Y"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-
-        onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                const userDocRef = doc(db, 'users', user.uid);
-                const userDocSnap = await getDoc(userDocRef);
-                
-                if (userDocSnap.exists()) {
-                    const userData = userDocSnap.data();
-                    loadDashboard(user.uid, userData.email);
-                } else {
-                    console.error('User document not found');
-                    window.location.href = 'login_portal.html';
-                }
-            } else {
-                window.location.href = 'login_portal.html';
-            }
-        });
-
-        document.getElementById('logoutBtn').addEventListener('click', () => {
-            signOut(auth).then(() => {
-                window.location.href = 'login_portal.html';
-            }).catch((error) => {
-                console.error('Logout Error:', error);
-            });
-        });
-
-        async function loadDashboard(userId, userEmail) {
-            const stepContainer = document.getElementById('stepContainer');
-            stepContainer.innerHTML = ''; // Clear existing content
-
-            // Step 1: Application Status
-            const freshmenApprovedApplicantsRef = doc(db, 'freshmen_approved_applicants', userId);
-            const transfereeApprovedApplicantsRef = doc(db, 'transferee_approved_applicants', userId);
-            const freshmenApprovedApplicantsSnap = await getDoc(freshmenApprovedApplicantsRef);
-            const transfereeApprovedApplicantsSnap = await getDoc(transfereeApprovedApplicantsRef);
-            const isFreshmenApproved = freshmenApprovedApplicantsSnap.exists();
-            const isTransfereeApproved = transfereeApprovedApplicantsSnap.exists();
-
-            let applicationStatus = {};
-
-            if (isFreshmenApproved) {
-                const approvedData = freshmenApprovedApplicantsSnap.data();
-                const fullName = approvedData.fullName;
-                applicationStatus = {
-                    color: 'green',
-                    text: `Freshmen application approved. Name: ${fullName}`,
-                };
-            } else if (isTransfereeApproved) {
-                const approvedData = transfereeApprovedApplicantsSnap.data();
-                const fullName = approvedData.fullName;
-                applicationStatus = {
-                    color: 'green',
-                    text: `Transferee application approved. Name: ${fullName}`,
-                };
-            } else {
-                applicationStatus = {
-                    color: 'red',
-                    text: 'Application not submitted',
-                };
-            }
-
-            const applicationStep = createStepBox('1. Application', applicationStatus);
-            stepContainer.appendChild(applicationStep);
-
-            // Step 2: Entrance Exam
-            const examStatus = await checkEntranceExamStatus(userId);
-            const examStep = createStepBox('2. Entrance Exam', examStatus);
-            stepContainer.appendChild(examStep);
-
-            // Step 3: Course
-            const courseStatus = await checkCourseStatus(userId);
-            const courseStep = createStepBox('3. Course', courseStatus);
-            stepContainer.appendChild(courseStep);
-
-            // Step 4: Required Document Upload
-            const documentUploadStatus = await checkDocumentUploadStatus(userEmail);
-            const documentUploadStep = createStepBox('4. Required Document Upload', documentUploadStatus);
-            stepContainer.appendChild(documentUploadStep);
-
-            // Step 5: Assessment
-            const assessmentStatus = await checkAssessmentStatus(userId);
-            const assessmentStep = createStepBox('5. Assessment', assessmentStatus);
-            stepContainer.appendChild(assessmentStep);
-
-            // Step 6: NSTP Confirmation
-            const nstpStatus = await checkNSTPStatus(userEmail);
-            const nstpStep = createStepBox('6. NSTP Confirmation', nstpStatus);
-            stepContainer.appendChild(nstpStep);
-
-            // Step 7: Enrollment
-            const enrollmentStatus = await checkEnrollmentStatus(userId);
-            const enrollmentStep = createStepBox('7. Enrollment', enrollmentStatus);
-            stepContainer.appendChild(enrollmentStep);
-
-            // Step 8: Medical and Hardcopy Submission
-            const medicalStatus = enrollmentStatus.color === 'green' ? 
-                { color: 'orange', text: 'Pending' } :
-                { color: 'orange', text: 'Complete the previous step first' };
-            const medicalStep = createStepBox('8. Medical and Hardcopy Submission', medicalStatus);
-            stepContainer.appendChild(medicalStep);
-
-            // Hide loading screen and show content
-            document.getElementById('loadingScreen').style.display = 'none';
-            document.querySelector('.content').style.display = 'block';
-        }
-
-        async function checkEntranceExamStatus(userId) {
-            const freshmenExamineesRef = doc(db, 'freshmen_examinees', userId);
-            const freshmenResultsRef = doc(db, 'freshmen_examinees_result', userId);
-            const transfereeExamineesRef = doc(db, 'transferee_examinees', userId);
-            const transfereeResultsRef = doc(db, 'transferee_examinees_result', userId);
-            
-            const freshmenExamineesSnap = await getDoc(freshmenExamineesRef);
-            const freshmenResultsSnap = await getDoc(freshmenResultsRef);
-            const transfereeExamineesSnap = await getDoc(transfereeExamineesRef);
-            const transfereeResultsSnap = await getDoc(transfereeResultsRef);
-
-            if ((freshmenExamineesSnap.exists() && freshmenResultsSnap.exists()) || 
-                (transfereeExamineesSnap.exists() && transfereeResultsSnap.exists())) {
-                return { color: 'green', text: 'Entrance examination is finished' };
-            } else if (freshmenExamineesSnap.exists() || transfereeExamineesSnap.exists()) {
-                return { color: 'yellow', text: 'Exam scheduled, results pending' };
-            } else {
-                return { color: 'orange', text: 'Complete the previous step first' };
-            }
-        }
-
-        async function checkCourseStatus(userId) {
-            const freshmenResultsRef = doc(db, 'freshmen_examinees_result', userId);
-            const transfereeResultsRef = doc(db, 'transferee_examinees_result', userId);
-            const freshmenResultsSnap = await getDoc(freshmenResultsRef);
-            const transfereeResultsSnap = await getDoc(transfereeResultsRef);
-
-            if (freshmenResultsSnap.exists()) {
-                const data = freshmenResultsSnap.data();
-                return { color: 'green', text: `Your course (Freshmen): ${data.course}` };
-            } else if (transfereeResultsSnap.exists()) {
-                const data = transfereeResultsSnap.data();
-                return { color: 'green', text: `Your course (Transferee): ${data.course}` };
-            } else {
-                return { color: 'orange', text: 'Complete the previous step first' };
-            }
-        }
-
-        async function checkDocumentUploadStatus(userEmail) {
-            const freshmenUploadDocRef = doc(db, 'freshmen_stepfour_upload_documents', userEmail);
-            const transfereeUploadDocRef = doc(db, 'transferee_stepfour_upload_documents', userEmail);
-            const freshmenUploadDocSnap = await getDoc(freshmenUploadDocRef);
-            const transfereeUploadDocSnap = await getDoc(transfereeUploadDocRef);
-
-            if (freshmenUploadDocSnap.exists() || transfereeUploadDocSnap.exists()) {
-                return { color: 'green', text: 'Documents uploaded successfully' };
-            } else {
-                return { color: 'red', text: 'Documents not uploaded, Upload it on Mobile App.' };
-            }
-        }
-
-        async function checkAssessmentStatus(userId) {
-            const freshmenAssessmentRef = doc(db, 'freshmen_assessment', userId);
-            const transfereeAssessmentRef = doc(db, 'transferee_assessment', userId);
-            const freshmenAssessmentSnap = await getDoc(freshmenAssessmentRef);
-            const transfereeAssessmentSnap = await getDoc(transfereeAssessmentRef);
-
-            if (freshmenAssessmentSnap.exists() || transfereeAssessmentSnap.exists()) {
-                return { color: 'green', text: 'Assessment completed' };
-            } else {
-                return { color: 'orange', text: 'Complete the previous step first' };
-            }
-        }
-
-        async function checkNSTPStatus(userEmail) {
-            const freshmenNstpRef = doc(db, 'freshmen_nstp_confirmation', userEmail);
-            const transfereeNstpRef = doc(db, 'transferee_nstp_confirmation', userEmail);
-            const freshmenNstpSnap = await getDoc(freshmenNstpRef);
-            const transfereeNstpSnap = await getDoc(transfereeNstpRef);
-
-            if (freshmenNstpSnap.exists()) {
-                const data = freshmenNstpSnap.data();
-                return { color: 'green', text: `NSTP Program (Freshmen): ${data.selected_nstp}` };
-            } else if (transfereeNstpSnap.exists()) {
-                const data = transfereeNstpSnap.data();
-                return { color: 'green', text: `NSTP Program (Transferee): ${data.selected_nstp}` };
-            } else {
-                return { color: 'red', text: 'NSTP not confirmed, Confirm it on Mobile App, After the confirmation of assessment.' };
-            }
-        }
-
-        async function checkEnrollmentStatus(userId) {
-            const freshmenEnrollmentRef = doc(db, 'freshmen_enrollment', userId);
-            const transfereeEnrollmentRef = doc(db, 'transferee_enrollment', userId);
-            const freshmenEnrollmentSnap = await getDoc(freshmenEnrollmentRef);
-            const transfereeEnrollmentSnap = await getDoc(transfereeEnrollmentRef);
-
-            if (freshmenEnrollmentSnap.exists() || transfereeEnrollmentSnap.exists()) {
-                return { color: 'green', text: 'Enrollment completed' };
-            } else {
-                return { color: 'orange', text: 'Complete the previous step first' };
-            }
-        }
-
-        function createStepBox(title, status) {
-            const stepBox = document.createElement('div');
-            stepBox.className = `step-box-wrapper`;
-            stepBox.innerHTML = `
-                <div class="step-box ${status.color}">
-                    <h3>${title}</h3>
-                    <i class="fas ${status.color === 'green' ? 'fa-check-circle text-success' : 
-                                    status.color === 'orange' ? 'fa-exclamation-circle text-warning' : 
-                                    status.color === 'red' ? 'fa-times-circle text-danger' :
-                                    'fa-spinner fa-spin text-warning'}"></i>
-                    ${status.text}
-                    ${status.action ? `<i class="fas fa-arrow-right arrow" onclick="window.location.href='${status.action}'"></i>` : ''}
-                </div>
-            `;
-            return stepBox;
-        }
-    </script>
+    <script type="module" src="dashboard.js"></script>
 </body>
 </html>
