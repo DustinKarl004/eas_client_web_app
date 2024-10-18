@@ -60,8 +60,11 @@
                     </li>
                 </ul>
                 <div>
-                    <a href="client_freshmenresults.html" class="btn p-2" style="background-color: #007200; width: 85px; display: inline-block; text-align: center; text-decoration: none; color: white;">
-                        View
+                    <a href="client_freshmenresults.html" class="btn p-2 me-2" style="background-color: #007200; width: 120px; display: inline-block; text-align: center; text-decoration: none; color: white;">
+                        Freshmen
+                    </a>
+                    <a href="client_transfereeresults.html" class="btn p-2" style="background-color: #007200; width: 120px; display: inline-block; text-align: center; text-decoration: none; color: white;">
+                        Transferee
                     </a>
                 </div>
             </div>
@@ -119,8 +122,7 @@
             .then(response => response.text())
             .then(data => {
                 document.getElementById('footer-container').innerHTML = data;
-                // Call the renderFooter function after the footer is loaded
-                renderFooter();
+                // Remove the call to renderFooter function
             });
 
         // Load fonts

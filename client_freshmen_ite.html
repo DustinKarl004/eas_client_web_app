@@ -58,7 +58,6 @@
             .then(response => response.text())
             .then(data => {
                 document.getElementById('footer-container').innerHTML = data;
-                renderFooter();
             });
 
         // Load fonts
@@ -77,6 +76,28 @@
                     link.classList.remove('active');
                 }
             });
+
+            // Handle dropdown items for freshmen only
+            const freshmenDropdownItems = document.querySelectorAll('#freshmenDropdown ~ .dropdown-menu .dropdown-item');
+            freshmenDropdownItems.forEach(item => {
+                if (item.textContent.trim().toLowerCase() === activePage.toLowerCase()) {
+                    item.classList.add('active');
+                    const parentDropdown = item.closest('.dropdown');
+                    if (parentDropdown) {
+                        parentDropdown.querySelector('.nav-link').classList.add('active');
+                    }
+                } else {
+                    item.classList.remove('active');
+                }
+            });
+
+            // Check if the active page is 'Results' for Freshmen
+            if (activePage === 'Results') {
+                const freshmenLink = document.querySelector('#freshmenDropdown');
+                freshmenLink.classList.add('active');
+                const resultsItem = document.querySelector('a[href*="freshmenresults"]');
+                resultsItem.classList.add('active');
+            }
         }
 
         function renderCard(title, text, link, linkText, colClass = 'col-lg-6', imageUrl = '') {

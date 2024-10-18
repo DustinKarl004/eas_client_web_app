@@ -7,7 +7,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
     <link rel="stylesheet" href="CSS/courses_css.css">
-    <title>Freshmen ICS Course Results</title>
+    <title>ITE Course Results</title>
 
 </head>
 
@@ -39,7 +39,7 @@
                 <div class="results-header">
                     <h3 class="results-title">
                         <i class="fas fa-graduation-cap me-2" style="color: #006400;"></i>
-                        <span id="course-title" style="color: #006400;">ICS Course Results</span>
+                        <span id="course-title" style="color: #006400;">ITE Course Results</span>
                     </h3>
                     <div class="total-students">
                         <i class="fas fa-user-friends me-2"></i>
@@ -75,11 +75,11 @@
     <script src="https://kit.fontawesome.com/37ca7b7c97.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     
-    <script type="module" src="Javascript/Freshmen/freshmen_ics_course.js"></script>
+    <script type="module" src="Javascript/Transferee/transferee_ite_course.js"></script>
 
     <script>
-// Load navbar
-fetch('components/navbar.html')
+                // Load navbar
+                fetch('components/navbar.html')
             .then(response => response.text())
             .then(data => {
                 document.getElementById('navbar-container').innerHTML = data;
@@ -110,9 +110,9 @@ fetch('components/navbar.html')
                 }
             });
 
-            // Handle dropdown items for freshmen only
-            const freshmenDropdownItems = document.querySelectorAll('#freshmenDropdown ~ .dropdown-menu .dropdown-item');
-            freshmenDropdownItems.forEach(item => {
+            // Handle dropdown items for transferee only
+            const transfereeDropdownItems = document.querySelectorAll('#transfereeDropdown ~ .dropdown-menu .dropdown-item');
+            transfereeDropdownItems.forEach(item => {
                 if (item.textContent.trim().toLowerCase() === activePage.toLowerCase()) {
                     item.classList.add('active');
                     const parentDropdown = item.closest('.dropdown');
@@ -124,15 +124,14 @@ fetch('components/navbar.html')
                 }
             });
 
-            // Check if the active page is 'Results' for Freshmen
+            // Check if the active page is 'Results' for Transferee
             if (activePage === 'Results') {
-                const freshmenLink = document.querySelector('#freshmenDropdown');
-                freshmenLink.classList.add('active');
-                const resultsItem = document.querySelector('a[href*="freshmenresults"]');
+                const transfereeLink = document.querySelector('#transfereeDropdown');
+                transfereeLink.classList.add('active');
+                const resultsItem = document.querySelector('a[href*="transfereeresults"]');
                 resultsItem.classList.add('active');
             }
         }
-
     </script>
     
 </body>

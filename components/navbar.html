@@ -20,15 +20,19 @@
         }
         .content {
             flex: 1 0 auto;
+            display: flex;
         }
         .navbar-nav .nav-link.active {
             border-bottom: 3px solid #fdc500;
+            color: #fdc500 !important;
         }
         .navbar-nav .nav-link {
             padding-bottom: 5px;
+            transition: all 0.3s ease;
         }
         .navbar-nav .nav-link:hover {
             border-bottom: 3px solid #fdc500;
+            color: #fdc500 !important;
         }
         .navbar-toggler-icon {
             background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255, 255, 255, 1%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
@@ -45,6 +49,28 @@
         .navbar-toggler .navbar-toggler-icon {
             background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255, 255, 255, 1%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
         }
+        .dropdown-menu {
+            background-color: #004b23;
+            border: none;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .dropdown-item {
+            color: white;
+            transition: all 0.3s ease;
+        }
+        .dropdown-item:hover, .dropdown-item:focus {
+            background-color: #006400;
+            color: #fdc500;
+        }
+        .dropdown-item.active {
+            background-color: #006400;
+            color: #fdc500;
+        }
+        .dropdown-item i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
         @media (max-width: 991px) {
             .navbar-brand {
                 max-width: 80%;
@@ -56,18 +82,8 @@
                 font-size: 1.2rem !important;   
             }
             .navbar-collapse {
-                position: fixed;
-                top: 59px;
-                left: -250px;
                 width: 250px;
-                height: calc(100vh - 59px);
                 background-color: #004b23;
-                transition: left 0.3s ease;
-                z-index: 1000;
-                overflow-y: auto;
-            }
-            .navbar-collapse.show {
-                left: 0;
             }
             .navbar-nav {
                 flex-direction: column;
@@ -84,9 +100,14 @@
             .navbar-nav .nav-link.active {
                 border-bottom: 3px solid #fdc500;
             }
-            .navbar-toggler {
-                position: relative;
-                z-index: 1001;
+            .navbar-nav::before {
+                content: '';
+                display: block;
+                width: 100%;
+                height: 5px;
+                background-color: #fdc500;
+                margin-top: -35px;
+                margin-bottom: 20px;
             }
         }
     </style>
@@ -114,15 +135,23 @@
                             <i class="fa-solid fa-house me-2"></i>Home
                         </a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-light" href="./client_freshmenexamSchedule.html">
-                            <i class="fa-regular fa-calendar-days me-2"></i>Freshmen Schedule
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle text-light" href="#" id="freshmenDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fa-solid fa-user-graduate me-2"></i>Freshmen
                         </a>
+                        <ul class="dropdown-menu" aria-labelledby="freshmenDropdown">
+                            <li><a class="dropdown-item" href="./client_freshmenexamSchedule.html"><i class="fa-solid fa-calendar-alt"></i>Schedule</a></li>
+                            <li><a class="dropdown-item" href="./client_freshmenresults.html"><i class="fa-solid fa-clipboard-check"></i>Results</a></li>
+                        </ul>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-light" href="./client_freshmenresults.html">
-                            <i class="fa-solid fa-square-poll-horizontal me-2"></i>Freshmen Results
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle text-light" href="#" id="transfereeDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fa-solid fa-exchange me-2"></i>Transferee
                         </a>
+                        <ul class="dropdown-menu" aria-labelledby="transfereeDropdown">
+                            <li><a class="dropdown-item" href="./client_transfereeexamSchedule.html"><i class="fa-solid fa-calendar-alt"></i>Schedule</a></li>
+                            <li><a class="dropdown-item" href="./client_transfereeresults.html"><i class="fa-solid fa-clipboard-check"></i>Results</a></li>
+                        </ul>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link text-light" href="./client_contact.html">
@@ -145,6 +174,32 @@
                 link.classList.remove('active');
             }
         });
+
+        // Handle dropdown items
+        const dropdownItems = document.querySelectorAll('.dropdown-item');
+        dropdownItems.forEach(item => {
+            if (item.textContent.trim().toLowerCase() === activePage.toLowerCase()) {
+                item.classList.add('active');
+                const parentDropdown = item.closest('.dropdown');
+                if (parentDropdown) {
+                    parentDropdown.querySelector('.nav-link').classList.add('active');
+                }
+            } else {
+                item.classList.remove('active');
+            }
+        });
+
+        // Check if the active page is 'Schedule' or 'Results' for Freshmen or Transferee
+        if (['Schedule', 'Results'].includes(activePage)) {
+            const freshmenLink = document.querySelector('#freshmenDropdown');
+            const transfereeLink = document.querySelector('#transfereeDropdown');
+            
+            if (document.querySelector('a[href*="freshmen"]').classList.contains('active')) {
+                freshmenLink.classList.add('active');
+            } else if (document.querySelector('a[href*="transferee"]').classList.contains('active')) {
+                transfereeLink.classList.add('active');
+            }
+        }
     }
     </script>
 </body>

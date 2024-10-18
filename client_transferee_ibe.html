@@ -4,10 +4,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-    <title>Results</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <title>IBE Courses</title>
     <style>
         .text-yellow {
             color: #fdc500;
+        }
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        main {
+            flex: 1 0 auto;
+        }
+        #footer-container {
+            flex-shrink: 0;
         }
     </style>
 </head>
@@ -17,12 +30,14 @@
     <!-- Navbar placeholder -->
     <div id="navbar-container"></div>
 
-    <!-- SELECT INSTITUTE -->
-    <div class="container flex">
-        <h1 class="text-center mb-3">Institute of:</h1>
+    <main>
+        <!-- SELECT COURSE -->
+        <div class="container flex">
+            <h1 class="text-center mb-3">Course:</h1>
 
-        <div class="row g-3 g-sm-3 mb-4" id="cardContainer"></div>
-    </div>
+            <div class="row g-3 g-sm-3 mb-4" id="cardContainer"></div>
+        </div>
+    </main>
 
     <!-- Footer placeholder -->
     <div id="footer-container"></div>
@@ -30,8 +45,8 @@
     <script src="https://kit.fontawesome.com/37ca7b7c97.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     <script>
-        // Load navbar
-        fetch('components/navbar.html')
+                // Load navbar
+                fetch('components/navbar.html')
             .then(response => response.text())
             .then(data => {
                 document.getElementById('navbar-container').innerHTML = data;
@@ -62,9 +77,9 @@
                 }
             });
 
-            // Handle dropdown items for freshmen only
-            const freshmenDropdownItems = document.querySelectorAll('#freshmenDropdown ~ .dropdown-menu .dropdown-item');
-            freshmenDropdownItems.forEach(item => {
+            // Handle dropdown items for transferee only
+            const transfereeDropdownItems = document.querySelectorAll('#transfereeDropdown ~ .dropdown-menu .dropdown-item');
+            transfereeDropdownItems.forEach(item => {
                 if (item.textContent.trim().toLowerCase() === activePage.toLowerCase()) {
                     item.classList.add('active');
                     const parentDropdown = item.closest('.dropdown');
@@ -76,16 +91,17 @@
                 }
             });
 
-            // Check if the active page is 'Results' for Freshmen
+            // Check if the active page is 'Results' for Transferee
             if (activePage === 'Results') {
-                const freshmenLink = document.querySelector('#freshmenDropdown');
-                freshmenLink.classList.add('active');
-                const resultsItem = document.querySelector('a[href*="freshmenresults"]');
+                const transfereeLink = document.querySelector('#transfereeDropdown');
+                transfereeLink.classList.add('active');
+                const resultsItem = document.querySelector('a[href*="transfereeresults"]');
                 resultsItem.classList.add('active');
             }
         }
 
-        function renderCard(title, text, link, linkText, imageUrl = '', colClass = 'col-lg-4') {
+
+        function renderCard(title, text, link, linkText, colClass = 'col-lg-6', imageUrl = '') {
             const cardHtml = `
                 <div class="${colClass} col-sm-12 col-md-6 mb-4">
                     <div class="card text-center" style="background-color: #007200; height: 100%; box-shadow: rgba(50, 50, 93, 0.25) 0px 13px 27px -5px, rgba(0, 0, 0, 0.3) 0px 8px 16px -8px;">
@@ -102,9 +118,8 @@
         }
 
         // Render cards
-        renderCard("ICS", "BSIT & BSCPE", "client_freshmen_ics.html", "See Results", "./assets/cdm_ics.png");
-        renderCard("ITE", "BSEd-Sci, BEEd-G, BECEd, BTLEd-ICT & TCP", "client_freshmen_ite.html", "See Results", "./assets/cdm_ite.png");
-        renderCard("IBE", "BSBA-HRM & BSEntrep", "client_freshmen_ibe.html", "See Results", "./assets/cdm_ibe.png");
+        renderCard("BSBA-HRM", "Bachelor of Science in Business Administration Major in Human Resource Management", "client_transferee_ibe_course.html?course=BSBA-HRM", "See Results");
+        renderCard("BSEntrep", "Bachelor of Science in Entrepreneurship", "client_transferee_ibe_course.html?course=BSEntrep", "See Results");
     </script>
 </body>
 </html>

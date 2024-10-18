@@ -99,7 +99,7 @@
 
     <script src="https://kit.fontawesome.com/37ca7b7c97.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
-    <script type="module" src="Javascript/Freshmen/freshmenexamSchedule.js"></script>
+    <script type="module" src="Javascript/Transferee/transfereeexamSchedule.js"></script>
 
     <script>
 
@@ -140,8 +140,8 @@
 
             
             // Handle dropdown items for freshmen only
-            const freshmenDropdownItems = document.querySelectorAll('#freshmenDropdown ~ .dropdown-menu .dropdown-item');
-            freshmenDropdownItems.forEach(item => {
+            const transfereeDropdownItems = document.querySelectorAll('#transfereeDropdown ~ .dropdown-menu .dropdown-item');
+            transfereeDropdownItems.forEach(item => {
                 if (item.textContent.trim().toLowerCase() === activePage.toLowerCase()) {
                     item.classList.add('active');
                     const parentDropdown = item.closest('.dropdown');
@@ -154,11 +154,11 @@
             });
 
             // Check if the active page is 'Results' for Freshmen
-            if (activePage === 'Results') {
-                const freshmenLink = document.querySelector('#freshmenDropdown');
-                freshmenLink.classList.add('active');
-                const resultsItem = document.querySelector('a[href*="freshmenresults"]');
-                resultsItem.classList.add('active');
+            if (activePage === 'Schedule') {
+                const scheduleLink = document.querySelector('#transfereeDropdown');
+                scheduleLink.classList.add('active');
+                const examScheduleItem = document.querySelector('a[href*="transfereeexamSchedule"]');
+                examScheduleItem.classList.add('active');
             }
         }
 
