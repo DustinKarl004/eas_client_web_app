@@ -135,7 +135,7 @@ window.showQRCodeModal = function(email, fullName, entranceId) {
             // Check if authenticated user's email matches the examinee's email
             if (enteredEmail === email) {
                 // Generate QR code with URL
-                const qrCodeUrl = `https://eas-client-web-app-vercel.app/client_freshmen_qrcode.html?entranceId=${entranceId}`;
+                const qrCodeUrl = `https://eas-client-web-app.vercel.app/client_freshmen_qrcode.html?entranceId=${entranceId}`;
                 const qr = qrcode(0, 'L');
                 qr.addData(qrCodeUrl);
                 qr.make();
