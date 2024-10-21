@@ -7,8 +7,69 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
     <link rel="stylesheet" href="CSS/client_cdm_Schedule.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
     <title>CdM SCHEDULE</title>
-
+    <style>
+        .modal-content {
+            background-color: #f8f9fa;
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        }
+        .modal-header {
+            background-color: #004b23;
+            color: white;
+            border-top-left-radius: 15px;
+            border-top-right-radius: 15px;
+        }
+        .modal-title {
+            font-weight: bold;
+        }
+        .modal-body {
+            padding: 30px;
+        }
+        #credentialForm .form-control {
+            border-radius: 10px;
+            border: 1px solid #ced4da;
+        }
+        #credentialForm .btn-primary {
+            background-color: #004b23;
+            border: none;
+            border-radius: 10px;
+            padding: 10px 20px;
+            font-weight: bold;
+        }
+        #qrCodeDisplay {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .credential-explanation {
+            background-color: #e9ecef;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+            color: #495057;
+        }
+        .qr-code-info {
+            background-color: #e7f1ff;
+            border-left: 5px solid #004b23;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+        .password-toggle {
+            cursor: pointer;
+            position: absolute;
+            right: 10px;
+            top: 70%;
+            transform: translateY(-50%);
+        }
+    </style>
 </head>
 
 <body>
@@ -22,6 +83,12 @@
             <div class="alert alert-info" role="alert">
                 <i class="fa-solid fa-triangle-exclamation me-2"></i><span class="fw-bold">Dear students,</span> 
                     kindly adhere to your exam schedule and make sure you arrive on time for each exam. Punctuality is essential, and failure to do so may result in penalties or missed opportunities.
+            </div>
+
+            <!-- QR Code Info -->
+            <div class="qr-code-info mb-4">
+                <h5><i class="fas fa-info-circle me-2"></i>What is the QR Code for?</h5>
+                <p>The QR Code serves as your digital exam pass. It contains your exam details and helps streamline the check-in process. Please generate and save your QR Code before your exam day for a smoother experience.</p>
             </div>
 
             <!-- SEARCH BAR -->
@@ -54,6 +121,7 @@
                                 <th><i class="fas fa-calendar-day me-2"></i>Date</th>
                                 <th><i class="fas fa-clock me-2"></i>Time</th>
                                 <th><i class="fas fa-door-open me-2"></i>Room</th>
+                                <th><i class="fas fa-qrcode me-2"></i>QR Code</th>
                             </tr>
                         </thead>
                         <tbody id="examineesTableBody">
@@ -69,6 +137,40 @@
                 </div>
             </div>
 
+        </div>
+    </div>
+
+    <!-- QR Code Modal -->
+    <div class="modal fade" id="qrCodeModal" tabindex="-1" aria-labelledby="qrCodeModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="qrCodeModalLabel"><i class="fas fa-qrcode me-2"></i>QR Code</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="credential-explanation">
+                        <p><strong>Important:</strong> To generate your QR code, please use the credentials from your mobile app. Enter the email and password associated with your app account below.</p>
+                        <p>This ensures the security and accuracy of your exam information.</p>
+                    </div>
+                    <form id="credentialForm">
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="email" required>
+                        </div>
+                        <div class="mb-3 position-relative">
+                            <label for="password" class="form-label">Password</label>
+                            <input type="password" class="form-control" id="password" required>
+                            <i class="fas fa-eye password-toggle" id="togglePassword"></i>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Generate QR Code</button>
+                    </form>
+                    <div id="qrCodeDisplay" class="mt-4" style="display: none;"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -144,6 +246,15 @@
         function renderFooter() {
             // Add any footer-specific rendering logic here if needed
         }
+
+        // Toggle password visibility
+        document.getElementById('togglePassword').addEventListener('click', function() {
+            const passwordInput = document.getElementById('password');
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            this.classList.toggle('fa-eye');
+            this.classList.toggle('fa-eye-slash');
+        });
 
     </script>
     

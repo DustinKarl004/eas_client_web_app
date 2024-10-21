@@ -1,5 +1,6 @@
-import { db } from '../firebase_config.js';
-import {collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { db, auth } from '../firebase_config.js';
+import { collection, getDocs, query, where, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
 // Variables
 let examinees = [];
@@ -50,6 +51,11 @@ function renderExamineesTable() {
             <td data-label="Date">${formatDate(examinee.examDate)}</td>
             <td data-label="Time">${formatTime(examinee.examStartTime)} - ${formatTime(examinee.examEndTime)}</td>
             <td data-label="Room">${examinee.room}</td>
+            <td data-label="QR Code">
+                <button class="btn btn-sm btn-info" onclick="showQRCodeModal('${examinee.email}', '${examinee.fullName}', '${examinee.entranceId}')">
+                    <i class="fas fa-qrcode me-2"></i>Show QR
+                </button>
+            </td>
         `;
         examineesTableBody.appendChild(row);
     });
@@ -111,6 +117,47 @@ function updateSortIcons() {
         icon.className = `fas fa-sort-${currentSort.direction === 'asc' ? 'up' : 'down'}`;
     }
 }
+
+// QR Code Modal
+window.showQRCodeModal = function(email, fullName, entranceId) {
+    const modal = new bootstrap.Modal(document.getElementById('qrCodeModal'));
+    modal.show();
+
+    document.getElementById('credentialForm').onsubmit = async function(e) {
+        e.preventDefault();
+        const enteredEmail = document.getElementById('email').value;
+        const enteredPassword = document.getElementById('password').value;
+
+        try {
+            // Authenticate user
+            await signInWithEmailAndPassword(auth, enteredEmail, enteredPassword);
+
+            // Check if authenticated user's email matches the examinee's email
+            if (enteredEmail === email) {
+                // Generate QR code with URL
+                const qrCodeUrl = `https://eas-client-web-app-vercel.app/client_freshmen_qrcode.html?entranceId=${entranceId}`;
+                const qr = qrcode(0, 'L');
+                qr.addData(qrCodeUrl);
+                qr.make();
+                document.getElementById('qrCodeDisplay').innerHTML = qr.createImgTag(5);
+                document.getElementById('qrCodeDisplay').style.display = 'block';
+            } else {
+                alert('Email does not match the examinee.');
+            }
+        } catch (error) {
+            console.error('Authentication error:', error);
+            alert('Authentication failed. Please check your credentials.');
+        }
+    };
+
+    // Clear input fields when modal is closed
+    document.getElementById('qrCodeModal').addEventListener('hidden.bs.modal', function () {
+        document.getElementById('email').value = '';
+        document.getElementById('password').value = '';
+        document.getElementById('qrCodeDisplay').style.display = 'none';
+        document.getElementById('qrCodeDisplay').innerHTML = '';
+    });
+};
 
 // Fetch and display exam schedule when the page loads
 fetchExamSchedule();
