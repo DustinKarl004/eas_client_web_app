@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -49,7 +48,7 @@
 
     <script type="module">
         import { db } from './Javascript/firebase_config.js';
-        import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         document.addEventListener('DOMContentLoaded', async () => {
             const urlParams = new URLSearchParams(window.location.search);
@@ -57,11 +56,14 @@
 
             if (entranceId) {
                 try {
-                    const examineeDoc = await getDoc(doc(db, 'freshmen_examinees', entranceId));
-                    if (examineeDoc.exists()) {
-                        const examineeData = examineeDoc.data();
+                    const examineesRef = collection(db, 'freshmen_examinees');
+                    const q = query(examineesRef, where('entranceId', '==', entranceId));
+                    const querySnapshot = await getDocs(q);
+
+                    if (!querySnapshot.empty) {
+                        const examineeData = querySnapshot.docs[0].data();
                         displayExamineeInfo(examineeData);
-                        generateQRCode(entranceId);
+                        generateQRCode(window.location.href);
                     } else {
                         document.getElementById('examineeInfo').innerHTML = '<p class="text-danger">Examinee not found.</p>';
                     }
@@ -87,9 +89,9 @@
             document.getElementById('examineeInfo').innerHTML = infoHtml;
         }
 
-        function generateQRCode(entranceId) {
+        function generateQRCode(url) {
             const qr = qrcode(0, 'L');
-            qr.addData(entranceId);
+            qr.addData(url);
             qr.make();
             document.getElementById('qrCode').innerHTML = qr.createImgTag(5);
         }
@@ -109,4 +111,3 @@
     </script>
 </body>
 </html>
-
