@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="assets/navbar_logo.png" type="image/png">
+    <title>Examinee QR Code</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f0f4f0;
+            font-family: 'Arial', sans-serif;
+        }
+        .container {
+            max-width: 600px;
+            margin-top: 50px;
+        }
+        .card {
+            border: none;
+            border-radius: 20px;
+            box-shadow: 0 10px 20px rgba(0, 75, 35, 0.1);
+            overflow: hidden;
+        }
+        .card-header {
+            background-color: #004b23;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        .card-body {
+            padding: 30px;
+        }
+        #qrCode {
+            text-align: center;
+            margin: 20px 0;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+        .profile-image-container {
+            text-align: center;
+            margin: 20px 0;
+        }
+        .profile-image {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 5px solid #004b23;
+            box-shadow: 0 4px 10px rgba(0, 75, 35, 0.2);
+        }
+        #examineeInfo {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+        #examineeInfo p {
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+        #examineeInfo strong {
+            color: #004b23;
+        }
+        .spinner-border {
+            color: #004b23 !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="card-header">
+                <h2 class="mb-0">Examinee Information</h2>
+            </div>
+            <div class="card-body">
+                <div id="loadingIndicator" class="text-center">
+                    <div class="spinner-border" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="mt-3">Loading examinee data...</p>
+                </div>
+                <div id="content" style="display: none;">
+                    <div id="qrCode"></div>
+                    <div id="capturedImageContainer" class="profile-image-container"></div>
+                    <div id="examineeInfo"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { db } from './Javascript/firebase_config.js';
+        import { collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getStorage, ref, getDownloadURL, listAll } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
+
+        const storage = getStorage();
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const entranceId = urlParams.get('entranceId');
+
+            if (entranceId) {
+                try {
+                    const examineesRef = collection(db, 'transferee_examinees');
+                    const q = query(examineesRef, where('entranceId', '==', entranceId));
+                    const querySnapshot = await getDocs(q);
+
+                    if (!querySnapshot.empty) {
+                        const examineeData = querySnapshot.docs[0].data();
+                        
+                        // Fetch the captured image from Firebase Storage
+                        const imageFolderRef = ref(storage, `uploads/transferee_captured_images/${examineeData.email}`);
+                        const imageList = await listAll(imageFolderRef);
+                        
+                        if (imageList.items.length > 0) {
+                            const imageUrl = await getDownloadURL(imageList.items[0]);
+                            await displayCapturedImage(imageUrl);
+                        } else {
+                            console.log("No captured image found for this examinee.");
+                            displayDefaultImage();
+                        }
+                        
+                        displayExamineeInfo(examineeData);
+                        generateQRCode(window.location.href);
+                        
+                        document.getElementById('loadingIndicator').style.display = 'none';
+                        document.getElementById('content').style.display = 'block';
+                    } else {
+                        showError('Examinee not found.');
+                    }
+                } catch (error) {
+                    console.error("Error fetching examinee data:", error);
+                    showError('Error loading examinee information.');
+                }
+            } else {
+                showError('No entrance ID provided.');
+            }
+        });
+
+        async function displayCapturedImage(imageUrl) {
+            try {
+                const imageContainer = document.getElementById('capturedImageContainer');
+                imageContainer.innerHTML = ''; // Clear any existing content
+                const img = document.createElement('img');
+                img.src = imageUrl;
+                img.alt = 'Examinee Photo';
+                img.className = 'profile-image';
+                imageContainer.appendChild(img);
+                console.log("Image displayed:", imageUrl);
+            } catch (error) {
+                console.error("Error displaying captured image:", error);
+                displayDefaultImage();
+            }
+        }
+
+        function displayDefaultImage() {
+            const imageContainer = document.getElementById('capturedImageContainer');
+            imageContainer.innerHTML = ''; // Clear any existing content
+            const img = document.createElement('img');
+            img.src = 'assets/default_profile.png'; // Updated path to default image
+            img.alt = 'Default Profile Photo';
+            img.className = 'profile-image';
+            imageContainer.appendChild(img);
+        }
+
+        function displayExamineeInfo(data) {
+            const infoHtml = `
+                <p><strong>Entrance ID:</strong> ${data.entranceId}</p>
+                <p><strong>Transferee</strong></p>
+                <p><strong>Email:</strong> ${data.email}</p>
+                <p><strong>Full Name:</strong> ${data.fullName}</p>
+                <p><strong>Batch:</strong> ${data.batchNumber}</p>
+                <p><strong>Date:</strong> ${formatDate(data.examDate)}</p>
+                <p><strong>Time:</strong> ${formatTime(data.examStartTime)} - ${formatTime(data.examEndTime)}</p>
+                <p><strong>Room:</strong> ${data.room}</p>
+               `;
+            document.getElementById('examineeInfo').innerHTML = infoHtml;
+        }
+
+        function generateQRCode(url) {
+            const qr = qrcode(0, 'L');
+            qr.addData(url);
+            qr.make();
+            document.getElementById('qrCode').innerHTML = qr.createImgTag(5);
+        }
+
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+        }
+
+        function formatTime(timeString) {
+            const [hours, minutes] = timeString.split(':');
+            const date = new Date();
+            date.setHours(parseInt(hours));
+            date.setMinutes(parseInt(minutes));
+            return date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+        }
+
+        function showError(message) {
+            document.getElementById('loadingIndicator').style.display = 'none';
+            document.getElementById('content').style.display = 'block';
+            document.getElementById('examineeInfo').innerHTML = `<p class="text-danger">${message}</p>`;
+        }
+    </script>
+</body>
+</html>

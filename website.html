@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="assets/navbar_logo.png" type="image/png">
+  <title>Download Colegio de Montalban Admission App</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f4f9;
+      color: #333;
+    }
+
+    /* Navbar Styles */
+    .navbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background-color: #004b23;
+      padding: 10px 20px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      transition: background-color 0.3s ease;
+    }
+
+    .navbar-scrolled {
+      background-color: rgba(0, 75, 35, 0.9);
+    }
+
+    .navbar-logo {
+      display: flex;
+      align-items: center;
+    }
+
+    .navbar-logo img {
+      height: 40px;
+      margin-right: 10px;
+    }
+
+    .navbar-text {
+      color: white;
+      font-size: 18px;
+      font-weight: bold;
+    }
+
+    .navbar ul {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: flex;
+    }
+
+    .navbar ul li {
+      margin: 0 15px;
+    }
+
+    .navbar ul li a {
+      color: white;
+      text-decoration: none;
+      font-size: 16px;
+      padding: 10px;
+      transition: color 0.3s ease, background-color 0.3s ease;
+    }
+
+    .navbar ul li a:hover {
+      background-color: #fdc500;
+      border-radius: 5px;
+      color: #004b23;
+    }
+
+    .navbar-toggle {
+      display: none;
+      cursor: pointer;
+      color: white;
+      font-size: 24px;
+    }
+
+    /* Container Styles */
+    .container {
+      text-align: center;
+      background-color: #ffffff;
+      padding: 40px;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      margin: 100px 20px 50px;
+      animation: fadeIn 1s ease-in-out;
+    }
+
+    h1 {
+      color: #004b23;
+      margin-bottom: 20px;
+      font-size: 28px;
+    }
+
+    p {
+      font-size: 18px;
+      margin-bottom: 30px;
+      color: #666;
+    }
+
+    .download-btn {
+      display: inline-block;
+      text-decoration: none;
+      background-color: #004b23;
+      color: white;
+      padding: 15px 30px;
+      border-radius: 5px;
+      font-size: 18px;
+      transition: background-color 0.3s ease, transform 0.3s ease;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+      opacity: 0.5;
+      pointer-events: none;
+    }
+
+    .download-btn.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .download-btn:hover {
+      background-color: #fdc500;
+      color: #004b23;
+      transform: translateY(-5px);
+    }
+
+    .apk-info {
+      margin-top: 20px;
+      font-size: 14px;
+      color: #888;
+    }
+
+    /* Keyframe animation */
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .navbar ul,
+      .navbar-toggle {
+        display: none;
+      }
+
+      .navbar-logo {
+        margin: 0 auto;
+      }
+
+      h1 {
+        font-size: 24px;
+      }
+
+      .download-btn {
+        font-size: 16px;
+        padding: 12px 25px;
+        display: block;
+        margin: 0 auto;
+      }
+
+      p {
+        font-size: 16px;
+      }
+
+      .container {
+        padding: 20px;
+        margin: 80px 10px 20px;
+      }
+    }
+
+    /* Additional Design Elements */
+    .features {
+      display: flex;
+      justify-content: space-around;
+      flex-wrap: wrap;
+      margin-top: 40px;
+    }
+
+    .feature {
+      flex-basis: 30%;
+      margin-bottom: 20px;
+      padding: 20px;
+      background-color: #f0f0f0;
+      border-radius: 10px;
+      transition: transform 0.3s ease;
+    }
+
+    .feature:hover {
+      transform: translateY(-5px);
+    }
+
+    .feature h3 {
+      color: #004b23;
+      margin-bottom: 10px;
+    }
+
+    @media (max-width: 768px) {
+      .feature {
+        flex-basis: 100%;
+      }
+    }
+
+    /* New styles for sections */
+    .section {
+      padding: 80px 20px 40px;
+      margin-bottom: 30px;
+    }
+
+    #about {
+      background-color: #e6f2e6;
+    }
+
+    #features {
+      background-color: #f2f2f2;
+    }
+
+    /* Toggle styles */
+    .toggle-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .toggle-label {
+      margin-right: 10px;
+    }
+
+    .toggle-switch {
+      position: relative;
+      display: inline-block;
+      width: 60px;
+      height: 34px;
+    }
+
+    .toggle-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      transition: .4s;
+      border-radius: 34px;
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 26px;
+      width: 26px;
+      left: 4px;
+      bottom: 4px;
+      background-color: white;
+      transition: .4s;
+      border-radius: 50%;
+    }
+
+    input:checked + .slider {
+      background-color: #004b23;
+    }
+
+    input:checked + .slider:before {
+      transform: translateX(26px);
+    }
+  </style>
+</head>
+<body>
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="navbar-logo">
+      <img src="./assets/navbar_logo.png" alt="Logo">
+      <span class="navbar-text">Colegio de Montalban</span>
+    </div>
+    <ul>
+      <li><a href="#home">Home</a></li>
+      <li><a href="#about">About</a></li>
+      <li><a href="#features">Features</a></li>
+    </ul>
+  </nav>
+
+  <!-- Home Section -->
+  <div id="home" class="section container">
+    <h1>Download the Colegio de Montalban Admission App</h1>
+    <p>Streamline your admission process with our Android app. Download now!</p>
+    <div class="toggle-container">
+      <span class="toggle-label">Enable Download</span>
+      <label class="toggle-switch">
+        <input type="checkbox" id="download-toggle">
+        <span class="slider"></span>
+      </label>
+    </div>
+    <a href="https://expo.dev/artifacts/eas/8eVDxqx6qYD3FkywNN54oC.apk" class="download-btn" id="download-btn" download>Download APK</a>
+    <div class="apk-info">
+      <p>Version 1.0.0 | Size: 91.20MB</p>
+    </div>
+  </div>
+
+  <!-- About Section -->
+  <div id="about" class="section">
+    <h2>About Colegio de Montalban Admission App</h2>
+    <p>The Colegio de Montalban Admission App is designed to simplify and streamline the admission process for prospective students. With this user-friendly mobile application, you can easily apply, track your application status, and stay updated on important admission-related information.</p>
+    <p>Our app is built with cutting-edge technology to ensure a smooth, secure, and efficient admission experience. Whether you're a senior high school graduate or a transferee, the Colegio de Montalban Admission App is your gateway to joining our esteemed institution.</p>
+  </div>
+
+  <!-- Features Section -->
+  <div id="features" class="section">
+    <h2>Key Features</h2>
+    <div class="features">
+      <div class="feature">
+        <h3>Easy Application</h3>
+        <p>Submit your application with just a few taps, upload documents directly from your device.</p>
+      </div>
+      <div class="feature">
+        <h3>Secure</h3>
+        <p>Your personal information and documents are protected with advanced encryption technology.</p>
+      </div>
+      <div class="feature">
+        <h3>Fast</h3>
+        <p>Experience a quick and efficient admission process with real-time updates and instant notifications.</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Enable/disable download button based on checkbox
+    const downloadToggle = document.getElementById('download-toggle');
+    const downloadBtn = document.getElementById('download-btn');
+
+    downloadToggle.addEventListener('change', function() {
+      if (this.checked) {
+        downloadBtn.classList.add('active');
+      } else {
+        downloadBtn.classList.remove('active');
+      }
+    });
+
+    // Navbar scroll effect
+    window.addEventListener('scroll', function() {
+      const navbar = document.querySelector('.navbar');
+      if (window.scrollY > 50) {
+        navbar.classList.add('navbar-scrolled');
+      } else {
+        navbar.classList.remove('navbar-scrolled');
+      }
+    });
+
+    // Smooth scrolling for anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+
+        document.querySelector(this.getAttribute('href')).scrollIntoView({
+          behavior: 'smooth'
+        });
+      });
+    });
+  </script>
+</body>
+</html>
