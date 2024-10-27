@@ -7,7 +7,12 @@ document.getElementById('login-form').addEventListener('submit', async (e) => {
     const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
     const errorElement = document.getElementById('login-error');
+    const submitButton = document.querySelector('button[type="submit"]');
     errorElement.style.display = 'none';
+
+    // Show loading indicator
+    submitButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Loading...';
+    submitButton.disabled = true;
 
     try {
         // Authenticate user
@@ -44,6 +49,10 @@ document.getElementById('login-form').addEventListener('submit', async (e) => {
 
         errorElement.textContent = errorMessage;
         errorElement.style.display = 'block';
+    } finally {
+        // Reset button state
+        submitButton.innerHTML = 'Login';
+        submitButton.disabled = false;
     }
 });
 
