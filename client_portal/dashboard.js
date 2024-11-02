@@ -89,7 +89,7 @@ async function loadDashboard(userId, userEmail) {
     stepContainer.appendChild(documentUploadStep);
 
     // Step 5: Assessment
-    const assessmentStatus = await checkAssessmentStatus(userId);
+    const assessmentStatus = await checkAssessmentStatus(userId, documentUploadStatus);
     const assessmentStep = createStepBox('5. Assessment', assessmentStatus);
     stepContainer.appendChild(assessmentStep);
 
@@ -99,13 +99,13 @@ async function loadDashboard(userId, userEmail) {
     stepContainer.appendChild(nstpStep);
 
     // Step 7: Enrollment
-    const enrollmentStatus = await checkEnrollmentStatus(userId);
+    const enrollmentStatus = await checkEnrollmentStatus(userId, nstpStatus);
     const enrollmentStep = createStepBox('7. Enrollment', enrollmentStatus);
     stepContainer.appendChild(enrollmentStep);
 
     // Step 8: Medical and Hardcopy Submission
     const medicalStatus = enrollmentStatus.color === 'green' ? 
-        { color: 'orange', text: 'Pending' } :
+        { color: 'yellow', text: 'Pending. Click "View Medical" in the navigation bar to access medical requirements.' } :
         { color: 'orange', text: 'Complete the previous step first' };
     const medicalStep = createStepBox('8. Medical and Hardcopy Submission', medicalStatus);
     stepContainer.appendChild(medicalStep);
@@ -166,7 +166,7 @@ async function checkDocumentUploadStatus(userEmail) {
     }
 }
 
-async function checkAssessmentStatus(userId) {
+async function checkAssessmentStatus(userId, documentUploadStatus) {
     const freshmenAssessmentRef = doc(db, 'freshmen_assessment', userId);
     const transfereeAssessmentRef = doc(db, 'transferee_assessment', userId);
     const freshmenAssessmentSnap = await getDoc(freshmenAssessmentRef);
@@ -174,6 +174,8 @@ async function checkAssessmentStatus(userId) {
 
     if (freshmenAssessmentSnap.exists() || transfereeAssessmentSnap.exists()) {
         return { color: 'green', text: 'Assessment completed' };
+    } else if (documentUploadStatus.color === 'green') {
+        return { color: 'yellow', text: 'Documents uploaded, assessment pending' };
     } else {
         return { color: 'orange', text: 'Complete the previous step first' };
     }
@@ -196,7 +198,7 @@ async function checkNSTPStatus(userEmail) {
     }
 }
 
-async function checkEnrollmentStatus(userId) {
+async function checkEnrollmentStatus(userId, nstpStatus) {
     const freshmenEnrollmentRef = doc(db, 'freshmen_enrollment', userId);
     const transfereeEnrollmentRef = doc(db, 'transferee_enrollment', userId);
     const freshmenEnrollmentSnap = await getDoc(freshmenEnrollmentRef);
@@ -204,6 +206,8 @@ async function checkEnrollmentStatus(userId) {
 
     if (freshmenEnrollmentSnap.exists() || transfereeEnrollmentSnap.exists()) {
         return { color: 'green', text: 'Enrollment completed' };
+    } else if (nstpStatus.color === 'green') {
+        return { color: 'yellow', text: 'NSTP confirmed, enrollment pending' };
     } else {
         return { color: 'orange', text: 'Complete the previous step first' };
     }
