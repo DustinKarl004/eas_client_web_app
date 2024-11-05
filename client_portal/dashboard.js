@@ -105,10 +105,17 @@ async function loadDashboard(userId, userEmail) {
 
     // Step 8: Medical and Hardcopy Submission
     const medicalStatus = enrollmentStatus.color === 'green' ? 
-        { color: 'yellow', text: 'Pending. Click "View Medical" in the navigation bar to access medical requirements.' } :
+        { color: 'yellow', text: 'Pending. Click here to access medical requirements.', action: 'https://drive.google.com/drive/folders/1fErkNTraFiQ56IYzRhcXPfiROgdCKfvq', newTab: true } :
         { color: 'orange', text: 'Complete the previous step first' };
     const medicalStep = createStepBox('8. Medical and Hardcopy Submission', medicalStatus);
     stepContainer.appendChild(medicalStep);
+
+    // Step 9: Temporary ID
+    const temporaryIdStatus = medicalStatus.color === 'yellow' ? 
+        { color: 'yellow', text: 'Click here to view your temporary ID', action: 'temporary_id.html', newTab: true } :
+        { color: 'orange', text: 'Complete the previous step first' };
+    const temporaryIdStep = createStepBox('9. Temporary ID', temporaryIdStatus);
+    stepContainer.appendChild(temporaryIdStep);
 
     // Hide loading screen and show content
     document.getElementById('loadingScreen').style.display = 'none';
@@ -224,8 +231,19 @@ function createStepBox(title, status) {
                             status.color === 'red' ? 'fa-times-circle text-danger' :
                             'fa-spinner fa-spin text-warning'}"></i>
             ${status.text}
-            ${status.action ? `<i class="fas fa-arrow-right arrow" onclick="window.location.href='${status.action}'"></i>` : ''}
+            ${status.action ? `<a href="${status.action}" class="step-link" ${status.newTab ? 'target="_blank" rel="noopener noreferrer"' : ''}><i class="fas fa-arrow-right arrow"></i></a>` : ''}
         </div>
     `;
+    if (status.action) {
+        stepBox.querySelector('.step-box').addEventListener('click', (e) => {
+            if (!e.target.closest('.step-link')) {
+                if (status.newTab) {
+                    window.open(status.action, '_blank', 'noopener,noreferrer');
+                } else {
+                    window.location.href = status.action;
+                }
+            }
+        });
+    }
     return stepBox;
 }
