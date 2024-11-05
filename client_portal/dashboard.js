@@ -1,6 +1,6 @@
 import { db, auth } from '../Javascript/firebase_config.js';
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 onAuthStateChanged(auth, async (user) => {
     if (user) {
@@ -112,7 +112,7 @@ async function loadDashboard(userId, userEmail) {
 
     // Step 9: Temporary ID
     const temporaryIdStatus = medicalStatus.color === 'yellow' ? 
-        { color: 'yellow', text: 'Click here to view your temporary ID', action: 'temporary_id.html', newTab: true } :
+        { color: 'yellow', text: 'Click here to view your temporary ID', action: generateTemporaryId, newTab: false } :
         { color: 'orange', text: 'Complete the previous step first' };
     const temporaryIdStep = createStepBox('9. Temporary ID', temporaryIdStatus);
     stepContainer.appendChild(temporaryIdStep);
@@ -231,13 +231,15 @@ function createStepBox(title, status) {
                             status.color === 'red' ? 'fa-times-circle text-danger' :
                             'fa-spinner fa-spin text-warning'}"></i>
             ${status.text}
-            ${status.action ? `<a href="${status.action}" class="step-link" ${status.newTab ? 'target="_blank" rel="noopener noreferrer"' : ''}><i class="fas fa-arrow-right arrow"></i></a>` : ''}
+            ${status.action ? `<a href="#" class="step-link"><i class="fas fa-arrow-right arrow"></i></a>` : ''}
         </div>
     `;
     if (status.action) {
-        stepBox.querySelector('.step-box').addEventListener('click', (e) => {
+        stepBox.querySelector('.step-box').addEventListener('click', async (e) => {
             if (!e.target.closest('.step-link')) {
-                if (status.newTab) {
+                if (typeof status.action === 'function') {
+                    await status.action();
+                } else if (status.newTab) {
                     window.open(status.action, '_blank', 'noopener,noreferrer');
                 } else {
                     window.location.href = status.action;
@@ -246,4 +248,54 @@ function createStepBox(title, status) {
         });
     }
     return stepBox;
+}
+
+async function generateTemporaryId() {
+    const user = auth.currentUser;
+    if (!user) {
+        console.error('User not authenticated');
+        return;
+    }
+
+    try {
+        const freshmenExamineesRef = doc(db, 'freshmen_examinees', user.uid);
+        const transfereeExamineesRef = doc(db, 'transferee_examinees', user.uid);
+        const freshmenExamineesSnap = await getDoc(freshmenExamineesRef);
+        const transfereeExamineesSnap = await getDoc(transfereeExamineesRef);
+
+        let entranceId, fullName, email, course;
+
+        if (freshmenExamineesSnap.exists()) {
+            const data = freshmenExamineesSnap.data();
+            entranceId = data.entranceId;
+            fullName = data.fullName;
+            email = data.email;
+            course = (await getDoc(doc(db, 'freshmen_examinees_result', user.uid))).data().course;
+        } else if (transfereeExamineesSnap.exists()) {
+            const data = transfereeExamineesSnap.data();
+            entranceId = data.entranceId;
+            fullName = data.fullName;
+            email = data.email;
+            course = (await getDoc(doc(db, 'transferee_examinees_result', user.uid))).data().course;
+        } else {
+            console.error('Examinee data not found');
+            return;
+        }
+
+        const lastFourDigits = entranceId.slice(-4);
+        const schoolStudentNumber = `25-0${lastFourDigits}`;
+
+        // Store in Firebase
+        await setDoc(doc(db, 'School_Student_Number', user.uid), {
+            fullName: fullName,
+            email: email,
+            course: course,
+            School_Student_Number: schoolStudentNumber
+        });
+
+        // Redirect to temporary ID page
+        window.location.href = `temporary_id.html?id=${schoolStudentNumber}`;
+    } catch (error) {
+        console.error('Error generating temporary ID:', error);
+    }
 }
