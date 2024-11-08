@@ -104,14 +104,14 @@ async function loadDashboard(userId, userEmail) {
     stepContainer.appendChild(enrollmentStep);
 
     // Step 8: Medical and Hardcopy Submission
-    const medicalStatus = enrollmentStatus.color === 'green' ? 
-        { color: 'yellow', text: 'Pending. Click here to access medical requirements.', action: 'https://drive.google.com/drive/folders/1fErkNTraFiQ56IYzRhcXPfiROgdCKfvq', newTab: true } :
-        { color: 'orange', text: 'Complete the previous step first' };
+    const medicalStatus = await checkMedicalStatus(userId, enrollmentStatus);
     const medicalStep = createStepBox('8. Medical and Hardcopy Submission', medicalStatus);
     stepContainer.appendChild(medicalStep);
 
     // Step 9: Temporary ID
-    const temporaryIdStatus = medicalStatus.color === 'yellow' ? 
+    const temporaryIdStatus = medicalStatus.color === 'green' ? 
+        { color: 'green', text: 'Temporary ID Generated', action: generateTemporaryId, newTab: false } :
+        medicalStatus.color === 'yellow' ? 
         { color: 'yellow', text: 'Click here to view your temporary ID', action: generateTemporaryId, newTab: false } :
         { color: 'orange', text: 'Complete the previous step first' };
     const temporaryIdStep = createStepBox('9. Temporary ID', temporaryIdStatus);
@@ -215,6 +215,21 @@ async function checkEnrollmentStatus(userId, nstpStatus) {
         return { color: 'green', text: 'Enrollment completed' };
     } else if (nstpStatus.color === 'green') {
         return { color: 'yellow', text: 'NSTP confirmed, enrollment pending' };
+    } else {
+        return { color: 'orange', text: 'Complete the previous step first' };
+    }
+}
+
+async function checkMedicalStatus(userId, enrollmentStatus) {
+    const freshmenMedicalRef = doc(db, 'freshmen_medical_completion', userId);
+    const transfereeMedicalRef = doc(db, 'transferee_medical_completion', userId);
+    const freshmenMedicalSnap = await getDoc(freshmenMedicalRef);
+    const transfereeMedicalSnap = await getDoc(transfereeMedicalRef);
+
+    if (freshmenMedicalSnap.exists() || transfereeMedicalSnap.exists()) {
+        return { color: 'green', text: 'Medical requirements completed' };
+    } else if (enrollmentStatus.color === 'green') {
+        return { color: 'yellow', text: 'Click here to access medical requirements.', action: 'https://drive.google.com/drive/folders/1fErkNTraFiQ56IYzRhcXPfiROgdCKfvq', newTab: true };
     } else {
         return { color: 'orange', text: 'Complete the previous step first' };
     }
