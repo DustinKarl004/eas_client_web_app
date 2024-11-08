@@ -1,6 +1,18 @@
 import { db, auth } from '../Javascript/firebase_config.js';
-import { signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+// Check if user is already logged in
+onAuthStateChanged(auth, async (user) => {
+    if (user) {
+        const userDocRef = doc(db, 'users', user.uid);
+        const userDocSnap = await getDoc(userDocRef);
+        
+        if (userDocSnap.exists()) {
+            window.location.href = 'dashboard.html';
+        }
+    }
+});
 
 document.getElementById('login-form').addEventListener('submit', async (e) => {
     e.preventDefault();
