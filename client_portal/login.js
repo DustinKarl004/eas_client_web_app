@@ -9,7 +9,13 @@ onAuthStateChanged(auth, async (user) => {
         const userDocSnap = await getDoc(userDocRef);
         
         if (userDocSnap.exists()) {
-            window.location.href = 'dashboard.html';
+            // Check if user has exam results
+            const hasResults = await checkExamResults(user.uid);
+            if (hasResults) {
+                window.location.href = 'dashboard.html';
+            } else {
+                auth.signOut(); // Sign out if no results
+            }
         }
     }
 });
@@ -31,16 +37,14 @@ document.getElementById('login-form').addEventListener('submit', async (e) => {
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
 
-        // Check if user has exam results for freshmen or transferees
-        const freshmenExamResultsRef = doc(db, 'freshmen_examinees_result', user.uid);
-        const transfereeExamResultsRef = doc(db, 'transferee_examinees_result', user.uid);
-        const freshmenExamResultsSnap = await getDoc(freshmenExamResultsRef);
-        const transfereeExamResultsSnap = await getDoc(transfereeExamResultsRef);
+        // Check if user has exam results
+        const hasResults = await checkExamResults(user.uid);
 
-        if (freshmenExamResultsSnap.exists() || transfereeExamResultsSnap.exists()) {
+        if (hasResults) {
             window.location.href = 'dashboard.html';
         } else {
-            throw new Error("You don't have permission to access this portal.");
+            await auth.signOut(); // Sign out if no results
+            throw new Error("You don't have permission to access this portal. Please wait for your exam results.");
         }
     } catch (error) {
         let errorMessage = 'Invalid email or password.';
@@ -67,6 +71,15 @@ document.getElementById('login-form').addEventListener('submit', async (e) => {
         submitButton.disabled = false;
     }
 });
+
+async function checkExamResults(uid) {
+    const freshmenExamResultsRef = doc(db, 'freshmen_examinees_result', uid);
+    const transfereeExamResultsRef = doc(db, 'transferee_examinees_result', uid);
+    const freshmenExamResultsSnap = await getDoc(freshmenExamResultsRef);
+    const transfereeExamResultsSnap = await getDoc(transfereeExamResultsRef);
+
+    return freshmenExamResultsSnap.exists() || transfereeExamResultsSnap.exists();
+}
 
 function togglePassword() {
     const passwordField = document.getElementById("password");
