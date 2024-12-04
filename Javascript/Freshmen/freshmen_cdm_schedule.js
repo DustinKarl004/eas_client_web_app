@@ -19,7 +19,7 @@ async function fetchExamSchedule(searchTerm = '') {
             throw new Error('Batch number not provided');
         }
 
-        const examineesQuery = query(collection(db, 'freshmen_examinees'), where('batchNumber', '==', batchNo));
+        const examineesQuery = query(collection(db, 'freshmen_examinees'), where('batchNumber', '==', parseInt(batchNo)));
         const examineesSnapshot = await getDocs(examineesQuery);
         examinees = examineesSnapshot.docs.map(doc => doc.data());
 

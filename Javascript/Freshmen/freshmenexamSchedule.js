@@ -9,6 +9,8 @@ async function fetchExamSchedule() {
         
         const container = document.getElementById('examScheduleContainer');
         container.innerHTML = '';
+        container.style.maxWidth = '800px'; // Added max width
+        container.style.margin = '0 auto'; // Center the container
 
         const batches = {};
         examinees.forEach(examinee => {
@@ -25,8 +27,14 @@ async function fetchExamSchedule() {
                     </div>  
                     <div class="card mb-5">
                         <div class="card-header" style="background-color: #007200; color: white;">
-                            <i class="fa-regular fa-calendar me-2"></i>
-                            ${formatDate(batchInfo.examDate)}
+                            <div>
+                                <i class="fa-regular fa-calendar me-2"></i>
+                                ${formatDate(batchInfo.examDate)}
+                            </div>
+                            <div class="mt-2">
+                                <i class="fas fa-door-open me-1"></i>
+                                Room: ${batchInfo.room}
+                            </div>
                         </div>
                         <div class="card-body d-flex justify-content-between align-items-center" style="background-color: #fdc500; color: #000;">
                             <div>
