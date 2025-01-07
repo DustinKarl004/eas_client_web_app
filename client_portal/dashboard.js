@@ -137,8 +137,20 @@ async function checkDocumentUploadStatus(userEmail) {
     const freshmenUploadDocSnap = await getDoc(freshmenUploadDocRef);
     const transfereeUploadDocSnap = await getDoc(transfereeUploadDocRef);
 
-    if (freshmenUploadDocSnap.exists() || transfereeUploadDocSnap.exists()) {
-        return { color: 'green', text: 'Documents uploaded successfully' };
+    if (freshmenUploadDocSnap.exists()) {
+        const data = freshmenUploadDocSnap.data();
+        if (data.confirmed) {
+            return { color: 'green', text: 'Documents uploaded and confirmed' };
+        } else {
+            return { color: 'yellow', text: 'Documents uploaded, pending confirmation' };
+        }
+    } else if (transfereeUploadDocSnap.exists()) {
+        const data = transfereeUploadDocSnap.data();
+        if (data.confirmed) {
+            return { color: 'green', text: 'Documents uploaded and confirmed' };
+        } else {
+            return { color: 'yellow', text: 'Documents uploaded, pending confirmation' };
+        }
     } else {
         return { color: 'red', text: 'Documents not uploaded, Upload it on Mobile App.' };
     }

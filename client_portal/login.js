@@ -9,12 +9,12 @@ onAuthStateChanged(auth, async (user) => {
         const userDocSnap = await getDoc(userDocRef);
         
         if (userDocSnap.exists()) {
-            // Check if user has exam results
-            const hasResults = await checkExamResults(user.uid);
-            if (hasResults) {
+            // Check if user has exam schedule
+            const hasSchedule = await checkExamSchedule(user.uid);
+            if (hasSchedule) {
                 window.location.href = 'dashboard.html';
             } else {
-                auth.signOut(); // Sign out if no results
+                auth.signOut(); // Sign out if no schedule
             }
         }
     }
@@ -37,14 +37,14 @@ document.getElementById('login-form').addEventListener('submit', async (e) => {
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
 
-        // Check if user has exam results
-        const hasResults = await checkExamResults(user.uid);
+        // Check if user has exam schedule
+        const hasSchedule = await checkExamSchedule(user.uid);
 
-        if (hasResults) {
+        if (hasSchedule) {
             window.location.href = 'dashboard.html';
         } else {
-            await auth.signOut(); // Sign out if no results
-            throw new Error("You don't have permission to access this portal. Please wait for your exam results.");
+            await auth.signOut(); // Sign out if no schedule
+            throw new Error("You don't have permission to access this portal. Please wait for your exam schedule.");
         }
     } catch (error) {
         let errorMessage = 'Invalid email or password.';
@@ -72,13 +72,13 @@ document.getElementById('login-form').addEventListener('submit', async (e) => {
     }
 });
 
-async function checkExamResults(uid) {
-    const freshmenExamResultsRef = doc(db, 'freshmen_examinees_result', uid);
-    const transfereeExamResultsRef = doc(db, 'transferee_examinees_result', uid);
-    const freshmenExamResultsSnap = await getDoc(freshmenExamResultsRef);
-    const transfereeExamResultsSnap = await getDoc(transfereeExamResultsRef);
+async function checkExamSchedule(uid) {
+    const freshmenExamineesRef = doc(db, 'freshmen_examinees', uid);
+    const transfereeExamineesRef = doc(db, 'transferee_examinees', uid);
+    const freshmenExamineesSnap = await getDoc(freshmenExamineesRef);
+    const transfereeExamineesSnap = await getDoc(transfereeExamineesRef);
 
-    return freshmenExamResultsSnap.exists() || transfereeExamResultsSnap.exists();
+    return freshmenExamineesSnap.exists() || transfereeExamineesSnap.exists();
 }
 
 function togglePassword() {
